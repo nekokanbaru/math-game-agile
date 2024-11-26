@@ -1,16 +1,25 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { View, Text, Button, StyleSheet } from 'react-native';
-import questions from '../questions.json';
+import questions from '../questions2.json';
 
-const GameScreen = () => {
+const GameScreen = ({ route }) => {
+    const { difficulty } = route.params; // Get selected difficulty
+    const filteredQuestions = questions.filter(
+        (question) => question.difficulty === difficulty
+    );
+
     const [usedQuestions, setUsedQuestions] = useState([]);
-    const [currentQuestionIndex, setCurrentQuestionIndex] = useState(getRandomIndex([]));
+    const [currentQuestionIndex, setCurrentQuestionIndex] = useState(0);
     const [feedback, setFeedback] = useState('');
     const [feedbackColor, setFeedbackColor] = useState('black'); // Default color
 
+    useEffect(() => {
+        setCurrentQuestionIndex(getRandomIndex([]));
+    }, []);
+
     // Function to get a random index that hasn't been used yet
     function getRandomIndex(usedIndices) {
-        const remainingIndices = questions
+        const remainingIndices = filteredQuestions
             .map((_, index) => index)
             .filter((index) => !usedIndices.includes(index));
         return remainingIndices[Math.floor(Math.random() * remainingIndices.length)];
@@ -18,19 +27,18 @@ const GameScreen = () => {
 
     // Handle the answer selection
     const handleAnswer = (selectedOption) => {
-        const currentQuestion = questions[currentQuestionIndex];
+        const currentQuestion = filteredQuestions[currentQuestionIndex];
         if (selectedOption === currentQuestion.answer) {
             setFeedback('Correct!');
-            setFeedbackColor('green'); // Set to green for correct answer
+            setFeedbackColor('green');
         } else {
             setFeedback('Incorrect.');
-            setFeedbackColor('red'); // Set to red for incorrect answer
+            setFeedbackColor('red');
         }
 
-        // Update the used questions list and load the next question
         setTimeout(() => {
             const updatedUsedQuestions = [...usedQuestions, currentQuestionIndex];
-            if (updatedUsedQuestions.length === questions.length) {
+            if (updatedUsedQuestions.length === filteredQuestions.length) {
                 // Reset if all questions are used
                 setUsedQuestions([]);
             } else {
@@ -51,10 +59,10 @@ const GameScreen = () => {
             ) : (
                 <>
                     <Text style={styles.question}>
-                        {questions[currentQuestionIndex].question}
+                        {filteredQuestions[currentQuestionIndex].question}
                     </Text>
                     <View style={styles.optionsContainer}>
-                        {questions[currentQuestionIndex].options.map((option, index) => (
+                        {filteredQuestions[currentQuestionIndex].options.map((option, index) => (
                             <View style={styles.optionButton} key={index}>
                                 <Button
                                     title={option.toString()}
@@ -73,7 +81,6 @@ const styles = StyleSheet.create({
     container: {
         flex: 1,
         justifyContent: 'center',
-        gap: '50',
         alignItems: 'center',
         padding: 20,
     },
