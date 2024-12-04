@@ -49,33 +49,31 @@ const GameScreen = ({ route }) => {
 
     return (
         <ImageBackground
-            source={{
-                uri: "https://cdn.discordapp.com/attachments/1187564659130253483/1312155007625465956/pozadina1.jpg?ex=674d7154&is=674c1fd4&hm=7d5d13b961ecd73c07dfef5f35038966986038d3249c6e27433adbbb252b4da5&",
-            }}
+            source={require('../assets/images/mathgame.png')}
             style={styles.background}
         >
             <View style={styles.pauseHeartContainer}>
                 <View>
                     <Image
                         style={styles.pauseImage}
-                        source={require('../pause.png')}
+                        source={require('../assets/pause.png')}
                         resizeMode="cover"
                     />
                 </View>
                 <View style={{ flexDirection: 'row' }}>
                     <Image
                         style={styles.heartImage}
-                        source={require('../heart.png')}
+                        source={require('../assets/heart.png')}
                         resizeMode="cover"
                     />
                     <Image
                         style={styles.heartImage}
-                        source={require('../heart.png')}
+                        source={require('../assets/heart.png')}
                         resizeMode="cover"
                     />
                     <Image
                         style={styles.heartImage}
-                        source={require('../heart.png')}
+                        source={require('../assets/heart.png')}
                         resizeMode="cover"
                     />
                 </View>
@@ -87,7 +85,7 @@ const GameScreen = ({ route }) => {
                 <View style={styles.stopwatchContainer}>
                     <Image
                         style={styles.stopwatchImage}
-                        source={require('../stopwatch.png')}
+                        source={require('../assets/stopwatch.png')}
                         resizeMode="cover"
                     />
                     <Text style={styles.scoreStopwatchText}>0:02</Text>
@@ -140,7 +138,7 @@ const styles = StyleSheet.create({
         fontSize: 65,
         marginBottom: 20,
         position: 'relative',
-        bottom: 70, // Podignuto pitanje
+        bottom: 40, // Podignuto pitanje
         textAlign: 'center',
         color: 'white',
         fontFamily: "BebasNeue-Regular",

@@ -4,14 +4,13 @@ import { StyleSheet, Text, View, ImageBackground, TouchableOpacity, Image } from
 const HomeScreen = ({ navigation }) => {
   return (
     <ImageBackground
-      source={{
-        uri: "https://cdn.discordapp.com/attachments/1187564659130253483/1312158372581347398/mathgame.png?ex=674b7a36&is=674a28b6&hm=863788692edfca7141f235c4f38c226e43847f36b91613b5c806150f663ec2b8&",
-      }}
+      source={require('../assets/images/mathgame.png')}
       style={styles.background}
     >
       <View style={styles.container}>
-        <Text style={styles.title}>MATH</Text>
-        <Text style={styles.title}>GAME</Text>
+        {/* Text with outline */}
+        <Text style={[styles.title, styles.titleOutline]}>MATH</Text>
+        <Text style={[styles.title, styles.titleOutline]}>GAME</Text>
         <View style={styles.profileImageContainer}>
           <Image
             style={styles.profileImage}
@@ -42,13 +41,11 @@ const styles = StyleSheet.create({
   },
   title: {
     fontSize: 100,
-    color: "#1E3A8A",
-    marginBottom: 20,
+    color: "#cfd4dd",
+    marginBottom: 10,
     fontFamily: 'BebasNeue-Regular',
-    textShadowColor: "#FFF", // Neon bela boja za ivice
-    textShadowOffset: { width: 2, height: 2 }, // Manji offset za oštriji efekat
-    textShadowRadius: 3, // Manji radijus za oštriji glow
   },
+
   profileImage: {
     resizeMode: 'cover',
     height: 200,
@@ -74,15 +71,10 @@ const styles = StyleSheet.create({
     elevation: 1,        // For Android shadow
   },
   buttonText: {
-    color: "#1E3A8A",
+    color: "#cfd4dd",
     fontSize: 50,
     fontFamily: "BebasNeue-Regular",
-    textShadowColor: "#FFF", // Neon bela boja za ivice
-    textShadowOffset: { width: 2, height: 2 }, // Manji offset za oštriji efekat
-    textShadowRadius: 3, // Manji radijus za oštriji glow
   }
 });
 
 export default HomeScreen;
-
-

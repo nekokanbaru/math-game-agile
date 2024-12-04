@@ -6,9 +6,7 @@ const DifficultyScreen = ({ navigation }) => {
 
     return (
         <ImageBackground
-            source={{
-                uri: "https://cdn.discordapp.com/attachments/1187564659130253483/1312158372581347398/mathgame.png?ex=674d7476&is=674c22f6&hm=f55bab1d0e613c310027d53f410a9c89271798126e0d2d23fb92bd7fd0e2892a&",
-            }}
+            source={require('../assets/images/mathgame.png')}
             style={styles.background}
         >
             <View style={styles.container}>
@@ -52,12 +50,9 @@ const styles = StyleSheet.create({
         elevation: 1,        // For Android shadow
     },
     buttonText: {
-        color: "#1E3A8A",
+        color: "#cfd4dd",
         fontSize: 50,
         fontFamily: "BebasNeue-Regular",
-        textShadowColor: "#FFF", // Neon bela boja za ivice
-        textShadowOffset: { width: 2, height: 2 }, // Manji offset za oštriji efekat
-        textShadowRadius: 3, // Manji radijus za oštriji glow
     }
 });
 
