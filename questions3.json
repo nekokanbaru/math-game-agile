@@ -1,0 +1,418 @@
+{
+  "easy": {
+    "levels": [
+      {
+        "level": 1,
+        "questions": [
+          {"question": "1 + 2", "options": [2, 3, 4, 5], "answer": 3},
+          {"question": "3 - 1", "options": [1, 2, 3, 4], "answer": 2},
+          {"question": "4 + 3", "options": [6, 7, 8, 9], "answer": 7},
+          {"question": "5 - 3", "options": [1, 2, 3, 4], "answer": 2},
+          {"question": "6 + 2", "options": [7, 8, 9, 10], "answer": 8},
+          {"question": "8 - 4", "options": [3, 4, 5, 6], "answer": 4},
+          {"question": "7 + 1", "options": [7, 8, 9, 10], "answer": 8},
+          {"question": "9 - 6", "options": [2, 3, 4, 5], "answer": 3},
+          {"question": "2 + 4", "options": [5, 6, 7, 8], "answer": 6},
+          {"question": "6 - 5", "options": [0, 1, 2, 3], "answer": 1}
+        ]
+      },
+      {
+        "level": 2,
+        "questions": [
+          {"question": "2 + 3", "options": [4, 5, 6, 7], "answer": 5},
+          {"question": "7 - 2", "options": [3, 4, 5, 6], "answer": 5},
+          {"question": "5 + 3", "options": [7, 8, 9, 10], "answer": 8},
+          {"question": "6 - 4", "options": [1, 2, 3, 4], "answer": 2},
+          {"question": "1 + 4", "options": [4, 5, 6, 7], "answer": 5},
+          {"question": "8 - 5", "options": [2, 3, 4, 5], "answer": 3},
+          {"question": "3 + 2", "options": [4, 5, 6, 7], "answer": 5},
+          {"question": "4 - 3", "options": [0, 1, 2, 3], "answer": 1},
+          {"question": "7 + 2", "options": [8, 9, 10, 11], "answer": 9},
+          {"question": "9 - 7", "options": [1, 2, 3, 4], "answer": 2}
+        ]
+      },
+      {
+        "level": 3,
+        "questions": [
+          {"question": "2 + 1", "options": [2, 3, 4, 5], "answer": 3},
+          {"question": "6 - 3", "options": [2, 3, 4, 5], "answer": 3},
+          {"question": "4 + 5", "options": [7, 8, 9, 10], "answer": 9},
+          {"question": "7 - 4", "options": [2, 3, 4, 5], "answer": 3},
+          {"question": "3 + 4", "options": [6, 7, 8, 9], "answer": 7},
+          {"question": "5 - 2", "options": [1, 2, 3, 4], "answer": 3},
+          {"question": "8 + 1", "options": [8, 9, 10, 11], "answer": 9},
+          {"question": "6 - 2", "options": [2, 3, 4, 5], "answer": 4},
+          {"question": "1 + 6", "options": [6, 7, 8, 9], "answer": 7},
+          {"question": "9 - 8", "options": [0, 1, 2, 3], "answer": 1}
+        ]
+      },
+      {
+        "level": 4,
+        "questions": [
+          {"question": "2 + 6", "options": [7, 8, 9, 10], "answer": 8},
+          {"question": "8 - 6", "options": [1, 2, 3, 4], "answer": 2},
+          {"question": "1 + 7", "options": [7, 8, 9, 10], "answer": 8},
+          {"question": "9 - 4", "options": [4, 5, 6, 7], "answer": 5},
+          {"question": "3 + 5", "options": [7, 8, 9, 10], "answer": 8},
+          {"question": "7 - 5", "options": [1, 2, 3, 4], "answer": 2},
+          {"question": "6 + 1", "options": [6, 7, 8, 9], "answer": 7},
+          {"question": "5 - 4", "options": [0, 1, 2, 3], "answer": 1},
+          {"question": "4 + 4", "options": [7, 8, 9, 10], "answer": 8},
+          {"question": "9 - 2", "options": [6, 7, 8, 9], "answer": 7}
+        ]
+      },
+      {
+        "level": 5,
+        "questions": [
+          {"question": "3 + 1", "options": [3, 4, 5, 6], "answer": 4},
+          {"question": "8 - 3", "options": [4, 5, 6, 7], "answer": 5},
+          {"question": "2 + 6", "options": [6, 7, 8, 9], "answer": 8},
+          {"question": "5 - 1", "options": [3, 4, 5, 6], "answer": 4},
+          {"question": "4 + 4", "options": [7, 8, 9, 10], "answer": 8},
+          {"question": "9 - 5", "options": [3, 4, 5, 6], "answer": 4},
+          {"question": "7 + 2", "options": [7, 8, 9, 10], "answer": 9},
+          {"question": "6 - 3", "options": [2, 3, 4, 5], "answer": 3},
+          {"question": "1 + 5", "options": [5, 6, 7, 8], "answer": 6},
+          {"question": "9 - 4", "options": [4, 5, 6, 7], "answer": 5}
+        ]
+      }
+    ]
+  },
+  "medium": {
+    "levels": [
+      {
+        "level": 1,
+        "questions": [
+          {"question": "3 + 1", "options": [3, 4, 5, 6], "answer": 4},
+          {"question": "6 - 2", "options": [3, 4, 5, 6], "answer": 4},
+          {"question": "2 × 2", "options": [3, 4, 5, 6], "answer": 4},
+          {"question": "4 ÷ 2", "options": [1, 2, 3, 4], "answer": 2},
+          {"question": "5 + 2", "options": [6, 7, 8, 9], "answer": 7},
+          {"question": "8 - 5", "options": [2, 3, 4, 5], "answer": 3},
+          {"question": "7 × 1", "options": [6, 7, 8, 9], "answer": 7},
+          {"question": "6 ÷ 3", "options": [1, 2, 3, 4], "answer": 2},
+          {"question": "2 + 6", "options": [6, 7, 8, 9], "answer": 8},
+          {"question": "9 - 4", "options": [3, 4, 5, 6], "answer": 5}
+        ]
+      },
+      {
+        "level": 2,
+        "questions": [
+          {"question": "4 × 2", "options": [6, 7, 8, 9], "answer": 8},
+          {"question": "8 ÷ 2", "options": [2, 3, 4, 5], "answer": 4},
+          {"question": "3 + 5", "options": [7, 8, 9, 10], "answer": 8},
+          {"question": "9 - 6", "options": [2, 3, 4, 5], "answer": 3},
+          {"question": "6 × 1", "options": [5, 6, 7, 8], "answer": 6},
+          {"question": "4 ÷ 1", "options": [3, 4, 5, 6], "answer": 4},
+          {"question": "7 + 2", "options": [8, 9, 10, 11], "answer": 9},
+          {"question": "5 - 3", "options": [1, 2, 3, 4], "answer": 2},
+          {"question": "2 × 3", "options": [5, 6, 7, 8], "answer": 6},
+          {"question": "8 ÷ 4", "options": [1, 2, 3, 4], "answer": 2}
+        ]
+      },
+      {
+        "level": 3,
+        "questions": [
+          {"question": "5 × 1", "options": [4, 5, 6, 7], "answer": 5},
+          {"question": "6 ÷ 2", "options": [2, 3, 4, 5], "answer": 3},
+          {"question": "4 + 3", "options": [6, 7, 8, 9], "answer": 7},
+          {"question": "8 - 2", "options": [5, 6, 7, 8], "answer": 6},
+          {"question": "7 × 1", "options": [6, 7, 8, 9], "answer": 7},
+          {"question": "9 ÷ 3", "options": [2, 3, 4, 5], "answer": 3},
+          {"question": "3 + 6", "options": [7, 8, 9, 10], "answer": 9},
+          {"question": "5 - 2", "options": [2, 3, 4, 5], "answer": 3},
+          {"question": "2 × 4", "options": [6, 7, 8, 9], "answer": 8},
+          {"question": "8 ÷ 2", "options": [2, 3, 4, 5], "answer": 4}
+        ]
+      },
+      {
+        "level": 4,
+        "questions": [
+          {"question": "6 × 1", "options": [5, 6, 7, 8], "answer": 6},
+          {"question": "9 ÷ 1", "options": [8, 9, 10, 11], "answer": 9},
+          {"question": "4 + 4", "options": [7, 8, 9, 10], "answer": 8},
+          {"question": "8 - 4", "options": [3, 4, 5, 6], "answer": 4},
+          {"question": "3 × 3", "options": [6, 7, 8, 9], "answer": 9},
+          {"question": "6 ÷ 3", "options": [1, 2, 3, 4], "answer": 2},
+          {"question": "5 + 3", "options": [7, 8, 9, 10], "answer": 8},
+          {"question": "7 - 2", "options": [4, 5, 6, 7], "answer": 5},
+          {"question": "2 × 4", "options": [6, 7, 8, 9], "answer": 8},
+          {"question": "8 ÷ 4", "options": [1, 2, 3, 4], "answer": 2}
+        ]
+      },
+      {
+        "level": 5,
+        "questions": [
+          {"question": "7 × 1", "options": [6, 7, 8, 9], "answer": 7},
+          {"question": "8 ÷ 2", "options": [2, 3, 4, 5], "answer": 4},
+          {"question": "3 + 5", "options": [7, 8, 9, 10], "answer": 8},
+          {"question": "9 - 4", "options": [3, 4, 5, 6], "answer": 5},
+          {"question": "6 × 1", "options": [5, 6, 7, 8], "answer": 6},
+          {"question": "4 ÷ 1", "options": [3, 4, 5, 6], "answer": 4},
+          {"question": "7 + 2", "options": [8, 9, 10, 11], "answer": 9},
+          {"question": "5 - 3", "options": [1, 2, 3, 4], "answer": 2},
+          {"question": "2 × 3", "options": [5, 6, 7, 8], "answer": 6},
+          {"question": "8 ÷ 4", "options": [1, 2, 3, 4], "answer": 2}
+        ]
+      }
+    ]
+  },
+  "hard": {
+    "levels": [
+      {
+        "level": 1,
+        "questions": [
+          {"question": "12 + 15", "options": [25, 27, 28, 30], "answer": 27},
+          {"question": "30 - 12", "options": [17, 18, 19, 20], "answer": 18},
+          {"question": "10 × 3", "options": [25, 30, 35, 40], "answer": 30},
+          {"question": "40 ÷ 5", "options": [6, 7, 8, 9], "answer": 8},
+          {"question": "15 + 10", "options": [22, 23, 24, 25], "answer": 25},
+          {"question": "24 - 8", "options": [14, 15, 16, 17], "answer": 16},
+          {"question": "9 × 5", "options": [35, 40, 45, 50], "answer": 45},
+          {"question": "30 ÷ 6", "options": [3, 4, 5, 6], "answer": 5},
+          {"question": "11 + 14", "options": [24, 25, 26, 27], "answer": 25},
+          {"question": "48 - 23", "options": [24, 25, 26, 27], "answer": 25}
+        ]
+      },
+      {
+        "level": 2,
+        "questions": [
+          {"question": "20 + 12", "options": [30, 31, 32, 33], "answer": 32},
+          {"question": "25 - 11", "options": [12, 13, 14, 15], "answer": 14},
+          {"question": "11 × 4", "options": [40, 42, 44, 46], "answer": 44},
+          {"question": "36 ÷ 6", "options": [4, 5, 6, 7], "answer": 6},
+          {"question": "15 + 13", "options": [27, 28, 29, 30], "answer": 28},
+          {"question": "42 - 17", "options": [24, 25, 26, 27], "answer": 25},
+          {"question": "12 × 3", "options": [30, 32, 34, 36], "answer": 36},
+          {"question": "20 ÷ 4", "options": [4, 5, 6, 7], "answer": 5},
+          {"question": "18 + 14", "options": [30, 31, 32, 33], "answer": 32},
+          {"question": "40 - 16", "options": [22, 23, 24, 25], "answer": 24}
+        ]
+      },
+      {
+        "level": 3,
+        "questions": [
+          {"question": "14 + 12", "options": [24, 25, 26, 27], "answer": 26},
+          {"question": "34 - 12", "options": [20, 21, 22, 23], "answer": 22},
+          {"question": "9 × 8", "options": [70, 72, 74, 76], "answer": 72},
+          {"question": "45 ÷ 5", "options": [8, 9, 10, 11], "answer": 9},
+          {"question": "21 + 15", "options": [35, 36, 37, 38], "answer": 36},
+          {"question": "42 - 18", "options": [22, 23, 24, 25], "answer": 24},
+          {"question": "8 × 7", "options": [54, 55, 56, 57], "answer": 56},
+          {"question": "32 ÷ 8", "options": [2, 3, 4, 5], "answer": 4},
+          {"question": "19 + 12", "options": [30, 31, 32, 33], "answer": 31},
+          {"question": "40 - 15", "options": [23, 24, 25, 26], "answer": 25}
+        ]
+      },
+      {
+        "level": 4,
+        "questions": [
+          {"question": "24 + 14", "options": [36, 37, 38, 39], "answer": 38},
+          {"question": "38 - 19", "options": [18, 19, 20, 21], "answer": 19},
+          {"question": "11 × 5", "options": [50, 51, 52, 55], "answer": 55},
+          {"question": "42 ÷ 7", "options": [5, 6, 7, 8], "answer": 6},
+          {"question": "27 + 11", "options": [37, 38, 39, 40], "answer": 38},
+          {"question": "39 - 17", "options": [20, 21, 22, 23], "answer": 22},
+          {"question": "6 × 6", "options": [34, 35, 36, 37], "answer": 36},
+          {"question": "48 ÷ 6", "options": [7, 8, 9, 10], "answer": 8},
+          {"question": "15 + 18", "options": [32, 33, 34, 35], "answer": 33},
+          {"question": "47 - 22", "options": [24, 25, 26, 27], "answer": 25}
+        ]
+      },
+      {
+        "level": 5,
+        "questions": [
+          {"question": "20 + 25", "options": [42, 43, 44, 45], "answer": 45},
+          {"question": "50 - 27", "options": [22, 23, 24, 25], "answer": 23},
+          {"question": "12 × 4", "options": [46, 47, 48, 49], "answer": 48},
+          {"question": "36 ÷ 4", "options": [7, 8, 9, 10], "answer": 9},
+          {"question": "23 + 17", "options": [38, 39, 40, 41], "answer": 40},
+          {"question": "46 - 24", "options": [21, 22, 23, 24], "answer": 22},
+          {"question": "11 × 6", "options": [64, 65, 66, 67], "answer": 66},
+          {"question": "48 ÷ 8", "options": [5, 6, 7, 8], "answer": 6},
+          {"question": "31 + 11", "options": [40, 41, 42, 43], "answer": 42},
+          {"question": "49 - 25", "options": [23, 24, 25, 26], "answer": 24}
+        ]
+      }
+    ]
+  },
+  "expert": {
+    "levels": [
+      {
+        "level": 1,
+        "questions": [
+          {
+            "question": "45 + 74",
+            "options": [118, 119, 120, 121],
+            "answer": 119
+          },
+          {
+            "question": "130 - 25",
+            "options": [104, 105, 106, 107],
+            "answer": 105
+          },
+          {"question": "12 × 6", "options": [70, 71, 72, 73], "answer": 72},
+          {"question": "144 ÷ 12", "options": [11, 12, 13, 14], "answer": 12},
+          {
+            "question": "48 + 62",
+            "options": [108, 109, 110, 111],
+            "answer": 110
+          },
+          {
+            "question": "156 - 47",
+            "options": [108, 109, 110, 111],
+            "answer": 109
+          },
+          {"question": "11 × 7", "options": [75, 76, 77, 78], "answer": 77},
+          {"question": "144 ÷ 9", "options": [15, 16, 17, 18], "answer": 16},
+          {
+            "question": "93 + 27",
+            "options": [118, 119, 120, 121],
+            "answer": 120
+          },
+          {"question": "105 - 8", "options": [95, 96, 97, 98], "answer": 97}
+        ]
+      },
+      {
+        "level": 2,
+        "questions": [
+          {
+            "question": "87 + 36",
+            "options": [121, 122, 123, 124],
+            "answer": 123
+          },
+          {
+            "question": "140 - 39",
+            "options": [100, 101, 102, 103],
+            "answer": 101
+          },
+          {"question": "13 × 5", "options": [63, 64, 65, 66], "answer": 65},
+          {"question": "132 ÷ 11", "options": [10, 11, 12, 13], "answer": 12},
+          {
+            "question": "53 + 58",
+            "options": [110, 111, 112, 113],
+            "answer": 111
+          },
+          {
+            "question": "160 - 57",
+            "options": [102, 103, 104, 105],
+            "answer": 103
+          },
+          {"question": "14 × 6", "options": [81, 82, 83, 84], "answer": 84},
+          {"question": "144 ÷ 8", "options": [16, 17, 18, 19], "answer": 18},
+          {
+            "question": "74 + 48",
+            "options": [120, 121, 122, 123],
+            "answer": 122
+          },
+          {"question": "116 - 24", "options": [91, 92, 93, 94], "answer": 92}
+        ]
+      },
+      {
+        "level": 3,
+        "questions": [
+          {
+            "question": "95 + 67",
+            "options": [160, 161, 162, 163],
+            "answer": 162
+          },
+          {
+            "question": "178 - 43",
+            "options": [133, 134, 135, 136],
+            "answer": 135
+          },
+          {"question": "11 × 9", "options": [96, 97, 98, 99], "answer": 99},
+          {"question": "144 ÷ 12", "options": [11, 12, 13, 14], "answer": 12},
+          {
+            "question": "84 + 46",
+            "options": [129, 130, 131, 132],
+            "answer": 130
+          },
+          {"question": "150 - 75", "options": [74, 75, 76, 77], "answer": 75},
+          {"question": "13 × 6", "options": [75, 76, 77, 78], "answer": 78},
+          {"question": "128 ÷ 8", "options": [14, 15, 16, 17], "answer": 16},
+          {
+            "question": "97 + 53",
+            "options": [149, 150, 151, 152],
+            "answer": 150
+          },
+          {
+            "question": "190 - 67",
+            "options": [122, 123, 124, 125],
+            "answer": 123
+          }
+        ]
+      },
+      {
+        "level": 4,
+        "questions": [
+          {
+            "question": "78 + 56",
+            "options": [133, 134, 135, 136],
+            "answer": 134
+          },
+          {
+            "question": "150 - 49",
+            "options": [100, 101, 102, 103],
+            "answer": 101
+          },
+          {"question": "14 × 7", "options": [95, 96, 97, 98], "answer": 98},
+          {"question": "144 ÷ 6", "options": [23, 24, 25, 26], "answer": 24},
+          {
+            "question": "63 + 58",
+            "options": [120, 121, 122, 123],
+            "answer": 121
+          },
+          {
+            "question": "200 - 57",
+            "options": [142, 143, 144, 145],
+            "answer": 143
+          },
+          {"question": "12 × 7", "options": [83, 84, 85, 86], "answer": 84},
+          {"question": "128 ÷ 16", "options": [7, 8, 9, 10], "answer": 8},
+          {
+            "question": "105 + 24",
+            "options": [128, 129, 130, 131],
+            "answer": 129
+          },
+          {"question": "135 - 42", "options": [92, 93, 94, 95], "answer": 93}
+        ]
+      },
+      {
+        "level": 5,
+        "questions": [
+          {
+            "question": "135 + 48",
+            "options": [181, 182, 183, 184],
+            "answer": 183
+          },
+          {
+            "question": "190 - 65",
+            "options": [123, 124, 125, 126],
+            "answer": 125
+          },
+          {"question": "13 × 6", "options": [75, 76, 77, 78], "answer": 78},
+          {"question": "144 ÷ 9", "options": [15, 16, 17, 18], "answer": 16},
+          {
+            "question": "94 + 87",
+            "options": [180, 181, 182, 183],
+            "answer": 181
+          },
+          {
+            "question": "210 - 93",
+            "options": [116, 117, 118, 119],
+            "answer": 117
+          },
+          {"question": "14 × 6", "options": [81, 82, 83, 84], "answer": 84},
+          {"question": "144 ÷ 12", "options": [11, 12, 13, 14], "answer": 12},
+          {
+            "question": "125 + 47",
+            "options": [171, 172, 173, 174],
+            "answer": 172
+          },
+          {"question": "176 - 84", "options": [90, 91, 92, 93], "answer": 92}
+        ]
+      }
+    ]
+  }
+}
