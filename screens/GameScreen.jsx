@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { View, Text, StyleSheet, ImageBackground, Image, TouchableOpacity } from 'react-native';
+import * as Animatable from 'react-native-animatable';
 import questions from '../questions2.json';
 
 const GameScreen = ({ route }) => {
@@ -12,6 +13,8 @@ const GameScreen = ({ route }) => {
     const [currentQuestionIndex, setCurrentQuestionIndex] = useState(0);
     const [feedback, setFeedback] = useState('');
     const [feedbackColor, setFeedbackColor] = useState('black');
+    const [lives, setLives] = useState([true, true, true]); // 3 srca
+    const [incorrectCount, setIncorrectCount] = useState(0); // Ukupno netačni odgovori
 
     useEffect(() => {
         setCurrentQuestionIndex(getRandomIndex([]));
@@ -32,6 +35,13 @@ const GameScreen = ({ route }) => {
         } else {
             setFeedback('Incorrect.');
             setFeedbackColor('red');
+            const newIncorrectCount = incorrectCount + 1;
+            setIncorrectCount(newIncorrectCount);
+
+            if (newIncorrectCount === 3) {
+                removeLife();
+                setIncorrectCount(0); // Resetujemo broj grešaka nakon gubitka života
+            }
         }
 
         setTimeout(() => {
@@ -47,6 +57,17 @@ const GameScreen = ({ route }) => {
         }, 1000);
     };
 
+    const removeLife = () => {
+        const updatedLives = [...lives];
+        const firstIndex = updatedLives.indexOf(true); // Pronađi prvo preostalo srce
+
+        if (firstIndex !== -1) {
+            updatedLives[firstIndex] = false; // Ukloni prvo srce
+            setLives(updatedLives);
+        }
+    };
+
+
     return (
         <ImageBackground
             source={require('../assets/images/mathgame.png')}
@@ -56,26 +77,21 @@ const GameScreen = ({ route }) => {
                 <View>
                     <Image
                         style={styles.pauseImage}
-                        source={require('../assets/pause.png')}
+                        source={require('../assets/images/pause.png')}
                         resizeMode="cover"
                     />
                 </View>
                 <View style={{ flexDirection: 'row' }}>
-                    <Image
-                        style={styles.heartImage}
-                        source={require('../assets/heart.png')}
-                        resizeMode="cover"
-                    />
-                    <Image
-                        style={styles.heartImage}
-                        source={require('../assets/heart.png')}
-                        resizeMode="cover"
-                    />
-                    <Image
-                        style={styles.heartImage}
-                        source={require('../assets/heart.png')}
-                        resizeMode="cover"
-                    />
+                    {lives.map((life, index) => (
+                        <Animatable.Image
+                            key={index}
+                            animation={life ? undefined : 'zoomOut'}
+                            duration={500}
+                            style={styles.heartImage}
+                            source={require('../assets/images/heart.png')}
+                            resizeMode="cover"
+                        />
+                    ))}
                 </View>
             </View>
             <View style={styles.pauseHeartContainer}>
@@ -85,7 +101,7 @@ const GameScreen = ({ route }) => {
                 <View style={styles.stopwatchContainer}>
                     <Image
                         style={styles.stopwatchImage}
-                        source={require('../assets/stopwatch.png')}
+                        source={require('../assets/images/stopwatch.png')}
                         resizeMode="cover"
                     />
                     <Text style={styles.scoreStopwatchText}>0:02</Text>
@@ -127,7 +143,7 @@ const styles = StyleSheet.create({
     background: {
         flex: 1,
         resizeMode: 'cover',
-        justifyContent: "center",
+        justifyContent: 'center',
     },
     feedback: {
         fontSize: 44,
@@ -138,10 +154,10 @@ const styles = StyleSheet.create({
         fontSize: 65,
         marginBottom: 20,
         position: 'relative',
-        bottom: 40, // Podignuto pitanje
+        bottom: 40,
         textAlign: 'center',
         color: 'white',
-        fontFamily: "BebasNeue-Regular",
+        fontFamily: 'BebasNeue-Regular',
     },
     optionsContainer: {
         flexDirection: 'row',
@@ -161,7 +177,7 @@ const styles = StyleSheet.create({
         fontSize: 60,
         color: 'white',
         textAlign: 'center',
-        fontFamily: "BebasNeue-Regular",
+        fontFamily: 'BebasNeue-Regular',
     },
     pauseHeartContainer: {
         flexDirection: 'row',
@@ -183,7 +199,7 @@ const styles = StyleSheet.create({
     scoreStopwatchText: {
         fontSize: 40,
         color: 'white',
-        fontFamily: "BebasNeue-Regular",
+        fontFamily: 'BebasNeue-Regular',
     },
     stopwatchContainer: {
         flexDirection: 'row',
@@ -191,15 +207,15 @@ const styles = StyleSheet.create({
         justifyContent: 'center',
         alignItems: 'center',
         borderWidth: 3,
-        borderColor: "#FFF",
-        padding: 10
+        borderColor: '#FFF',
+        padding: 10,
     },
     scoreContainer: {
         borderWidth: 3,
-        borderColor: "#FFF",
+        borderColor: '#FFF',
         padding: 5,
         justifyContent: 'center',
-        alignItems: 'center'
+        alignItems: 'center',
     },
 });
 
