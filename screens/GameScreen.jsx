@@ -1,78 +1,57 @@
 import React, { useState, useEffect } from 'react';
 import { View, Text, StyleSheet, ImageBackground, Image, TouchableOpacity } from 'react-native';
 import * as Animatable from 'react-native-animatable';
-import questions from '../questions2.json';
 
 const GameScreen = ({ route }) => {
-    const { difficulty } = route.params;
-    const filteredQuestions = questions.filter(
-        (question) => question.difficulty === difficulty
-    );
+    const { questions } = route.params; // Get the questions passed from SelectLevel screen
 
-    const [usedQuestions, setUsedQuestions] = useState([]);
     const [currentQuestionIndex, setCurrentQuestionIndex] = useState(0);
     const [feedback, setFeedback] = useState('');
     const [feedbackColor, setFeedbackColor] = useState('black');
-    const [lives, setLives] = useState([true, true, true]); // 3 srca
-    const [incorrectCount, setIncorrectCount] = useState(0); // Ukupno netačni odgovori
+    const [lives, setLives] = useState([true, true, true]);
+
+    const currentQuestion = questions[currentQuestionIndex];
 
     useEffect(() => {
-        setCurrentQuestionIndex(getRandomIndex([]));
-    }, []);
-
-    function getRandomIndex(usedIndices) {
-        const remainingIndices = filteredQuestions
-            .map((_, index) => index)
-            .filter((index) => !usedIndices.includes(index));
-        return remainingIndices[Math.floor(Math.random() * remainingIndices.length)];
-    }
+        setFeedback('');
+        setFeedbackColor('black');
+    }, [currentQuestionIndex]);
 
     const handleAnswer = (selectedOption) => {
-        const currentQuestion = filteredQuestions[currentQuestionIndex];
         if (selectedOption === currentQuestion.answer) {
             setFeedback('Correct!');
             setFeedbackColor('green');
         } else {
             setFeedback('Incorrect.');
             setFeedbackColor('red');
-            const newIncorrectCount = incorrectCount + 1;
-            setIncorrectCount(newIncorrectCount);
-
-            if (newIncorrectCount === 3) {
-                removeLife();
-                setIncorrectCount(0); // Resetujemo broj grešaka nakon gubitka života
-            }
+            removeLife();
         }
 
         setTimeout(() => {
-            const updatedUsedQuestions = [...usedQuestions, currentQuestionIndex];
-            if (updatedUsedQuestions.length === filteredQuestions.length) {
-                setUsedQuestions([]);
+            const nextIndex = currentQuestionIndex + 1;
+            if (nextIndex < questions.length) {
+                setCurrentQuestionIndex(nextIndex);
             } else {
-                setUsedQuestions(updatedUsedQuestions);
+                // If all questions are used, handle end of level
             }
-            setCurrentQuestionIndex(getRandomIndex(updatedUsedQuestions));
-            setFeedback('');
-            setFeedbackColor('black');
         }, 1000);
     };
 
     const removeLife = () => {
         const updatedLives = [...lives];
-        const firstIndex = updatedLives.indexOf(true); // Pronađi prvo preostalo srce
-
+        const firstIndex = updatedLives.indexOf(true);
         if (firstIndex !== -1) {
-            updatedLives[firstIndex] = false; // Ukloni prvo srce
+            updatedLives[firstIndex] = false;
             setLives(updatedLives);
         }
     };
-
 
     return (
         <ImageBackground
             source={require('../assets/images/mathgame.png')}
             style={styles.background}
         >
+            {/* Top Section: Hearts, Pause Icon, Score, Timer */}
             <View style={styles.pauseHeartContainer}>
                 <View>
                     <Image
@@ -94,6 +73,7 @@ const GameScreen = ({ route }) => {
                     ))}
                 </View>
             </View>
+
             <View style={styles.pauseHeartContainer}>
                 <View style={styles.scoreContainer}>
                     <Text style={styles.scoreStopwatchText}>Score: 31</Text>
@@ -107,22 +87,22 @@ const GameScreen = ({ route }) => {
                     <Text style={styles.scoreStopwatchText}>0:02</Text>
                 </View>
             </View>
+
+            {/* Main Game Section: Question and Options */}
             <View style={styles.container}>
                 {feedback ? (
                     <Text style={[styles.feedback, { color: feedbackColor }]}>{feedback}</Text>
                 ) : (
                     <>
-                        <Text style={styles.question}>
-                            {filteredQuestions[currentQuestionIndex].question}
-                        </Text>
+                        <Text style={styles.question}>{currentQuestion.question}</Text>
                         <View style={styles.optionsContainer}>
-                            {filteredQuestions[currentQuestionIndex].options.map((option, index) => (
+                            {currentQuestion.options.map((option, index) => (
                                 <TouchableOpacity
                                     key={index}
                                     style={styles.optionButton}
                                     onPress={() => handleAnswer(option)}
                                 >
-                                    <Text style={styles.optionText}>{option.toString()}</Text>
+                                    <Text style={styles.optionText}>{option}</Text>
                                 </TouchableOpacity>
                             ))}
                         </View>
@@ -166,7 +146,7 @@ const styles = StyleSheet.create({
         width: '100%',
     },
     optionButton: {
-        width: '20%',
+        width: '30%',
         backgroundColor: 'transparent',
         borderWidth: 2,
         borderColor: '#fff',

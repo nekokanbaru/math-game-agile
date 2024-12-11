@@ -14,7 +14,7 @@ const DifficultyScreen = ({ navigation }) => {
                     <TouchableOpacity
                         key={index}
                         style={styles.button}
-                        onPress={() => navigation.navigate('Game', { difficulty })}
+                        onPress={() => navigation.navigate('SelectLevel', { difficulty })}
                     >
                         <Text style={styles.buttonText}>{difficulty.toUpperCase()}</Text>
                     </TouchableOpacity>
