@@ -18,15 +18,6 @@ const GameScreen = ({ route, navigation }) => {
         setFeedbackColor('black');
     }, [currentQuestionIndex]);
 
-    function shuffleArray(array) {
-        for (let i = array.length - 1; i > 0; i--) {
-            const j = Math.floor(Math.random() * (i + 1));
-            [array[i], array[j]] = [array[j], array[i]];
-        }
-        return array;
-    }
-
-
     const handleAnswer = (selectedOption) => {
         if (selectedOption === currentQuestion.answer) {
             setFeedback('Correct!');
@@ -45,19 +36,8 @@ const GameScreen = ({ route, navigation }) => {
                 // If all questions are used, handle end of level
                 setGameOver(true);
             }
-
-            const newQuestionIndex = getRandomIndex(updatedUsedQuestions);
-            setCurrentQuestionIndex(newQuestionIndex);
-
-            // Shuffle the options for the new question
-            const shuffledOptions = shuffleArray([...filteredQuestions[newQuestionIndex].options]);
-            filteredQuestions[newQuestionIndex].options = shuffledOptions;
-
-            setFeedback('');
-            setFeedbackColor('black');
         }, 1000);
     };
-
 
     const removeLife = () => {
         const updatedLives = [...lives];
