@@ -12,7 +12,7 @@ const SelectLevelScreen = ({ route, navigation }) => {
                 <TouchableOpacity
                     key={index}
                     style={styles.button}
-                    onPress={() => navigation.navigate('Game', { questions: level.questions })}
+                    onPress={() => navigation.navigate('Game', { questions: level.questions, difficulty: difficulty, level: level.level })}
                 >
                     <Text style={styles.buttonText}>Level {level.level}</Text>
                 </TouchableOpacity>
