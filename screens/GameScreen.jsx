@@ -27,6 +27,15 @@ const GameScreen = ({ route }) => {
         return remainingIndices[Math.floor(Math.random() * remainingIndices.length)];
     }
 
+    function shuffleArray(array) {
+        for (let i = array.length - 1; i > 0; i--) {
+            const j = Math.floor(Math.random() * (i + 1));
+            [array[i], array[j]] = [array[j], array[i]];
+        }
+        return array;
+    }
+
+
     const handleAnswer = (selectedOption) => {
         const currentQuestion = filteredQuestions[currentQuestionIndex];
         if (selectedOption === currentQuestion.answer) {
@@ -51,11 +60,18 @@ const GameScreen = ({ route }) => {
             } else {
                 setUsedQuestions(updatedUsedQuestions);
             }
-            setCurrentQuestionIndex(getRandomIndex(updatedUsedQuestions));
+            const newQuestionIndex = getRandomIndex(updatedUsedQuestions);
+            setCurrentQuestionIndex(newQuestionIndex);
+
+            // Shuffle the options for the new question
+            const shuffledOptions = shuffleArray([...filteredQuestions[newQuestionIndex].options]);
+            filteredQuestions[newQuestionIndex].options = shuffledOptions;
+
             setFeedback('');
             setFeedbackColor('black');
         }, 1000);
     };
+
 
     const removeLife = () => {
         const updatedLives = [...lives];
