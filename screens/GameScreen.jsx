@@ -10,13 +10,46 @@ const GameScreen = ({ route, navigation }) => {
     const [feedbackColor, setFeedbackColor] = useState('black');
     const [lives, setLives] = useState([true, true, true]);
     const [gameOver, setGameOver] = useState(false);
+    const [shuffledOptions, setShuffledOptions] = useState([]); // State to store shuffled options
+    const [timer, setTimer] = useState(120); // Set initial time to 2 minutes (120 seconds)
 
     const currentQuestion = questions[currentQuestionIndex];
 
+    // Shuffle function to randomize the order of the options
+    function shuffleArray(array) {
+        for (let i = array.length - 1; i > 0; i--) {
+            const j = Math.floor(Math.random() * (i + 1));
+            [array[i], array[j]] = [array[j], array[i]]; // Swap elements
+        }
+        return array;
+    }
+
+    // Shuffle the options whenever the current question changes
     useEffect(() => {
-        setFeedback('');
+        if (currentQuestion) {
+            setShuffledOptions(shuffleArray([...currentQuestion.options]));
+        }
+        setFeedback(''); // Reset feedback when changing questions
         setFeedbackColor('black');
     }, [currentQuestionIndex]);
+
+    // Start and manage the timer
+    useEffect(() => {
+        const timerInterval = setInterval(() => {
+            setTimer(prevTime => {
+                if (prevTime <= 1) {
+                    clearInterval(timerInterval);
+                    setGameOver(true);
+                    setFeedback('Time’s up!');
+                    return 0; // Timer reached 0, game over
+                }
+                return prevTime - 1; // Decrement timer
+            });
+        }, 1000); // Update every second
+
+        // Clean up the interval when the component unmounts or game ends
+        return () => clearInterval(timerInterval);
+    }, []);
 
     const handleAnswer = (selectedOption) => {
         if (selectedOption === currentQuestion.answer) {
@@ -54,41 +87,50 @@ const GameScreen = ({ route, navigation }) => {
 
     const handleBackToHome = () => {
         navigation.navigate('Home');
-    }
+    };
 
     const handleNextLevel = () => {
-    if (level < 5) {
-        // Increment the level
-        const nextLevel = level + 1;
+        if (level < 5) {
+            // Increment the level
+            const nextLevel = level + 1;
 
-        // Get the next level's questions based on the difficulty
-        const nextQuestions = getQuestionsForLevel(difficulty, nextLevel);
+            // Get the next level's questions based on the difficulty
+            const nextQuestions = getQuestionsForLevel(difficulty, nextLevel);
 
-        // Reset the current question index to 0
-        setCurrentQuestionIndex(0);
+            // Reset the current question index to 0
+            setCurrentQuestionIndex(0);
 
-        // Reset the game over state for the next level
-        setGameOver(false);
+            // Reset the game over state for the next level
+            setGameOver(false);
 
-        // Navigate to the Game screen with the next level and its questions
-        navigation.navigate('Game', {
-            questions: nextQuestions,
-            difficulty: difficulty,
-            level: nextLevel,
-        });
-    }
-};
+            // Reset the timer to 2 minutes for the next level
+            setTimer(120);
 
-    
+            // Navigate to the Game screen with the next level and its questions
+            navigation.navigate('Game', {
+                questions: nextQuestions,
+                difficulty: difficulty,
+                level: nextLevel,
+            });
+        }
+    };
+
     const getQuestionsForLevel = (difficulty, level) => {
         const allQuestions = require('../questions3.json'); // Make sure this path is correct
-    
+
         // Fetch the questions for the given level and difficulty
         const questionsForLevel = allQuestions[difficulty]?.levels.find(
             (lvl) => lvl.level === level
         );
-    
+
         return questionsForLevel ? questionsForLevel.questions : [];
+    };
+
+    // Function to format the timer as mm:ss
+    const formatTime = (seconds) => {
+        const minutes = Math.floor(seconds / 60);
+        const remainingSeconds = seconds % 60;
+        return `${minutes}:${remainingSeconds < 10 ? '0' : ''}${remainingSeconds}`;
     };
 
     return (
@@ -129,7 +171,7 @@ const GameScreen = ({ route, navigation }) => {
                         source={require('../assets/images/stopwatch.png')}
                         resizeMode="cover"
                     />
-                    <Text style={styles.scoreStopwatchText}>0:02</Text>
+                    <Text style={styles.scoreStopwatchText}>{formatTime(timer)}</Text>
                 </View>
             </View>
 
@@ -154,11 +196,11 @@ const GameScreen = ({ route, navigation }) => {
                             </TouchableOpacity>
                         </View>
                         <TouchableOpacity
-                                style={[styles.button]}
-                                onPress={handleBackToHome}
-                                disabled={level === 5}
-                            >
-                                <Text style={styles.buttonText}>Back to home</Text>
+                            style={[styles.button]}
+                            onPress={handleBackToHome}
+                            disabled={level === 5}
+                        >
+                            <Text style={styles.buttonText}>Back to home</Text>
                         </TouchableOpacity>
                     </View>
                 ) : (
@@ -170,7 +212,7 @@ const GameScreen = ({ route, navigation }) => {
                         )}
 
                         <View style={styles.optionsContainer}>
-                            {currentQuestion.options.map((option, index) => (
+                            {shuffledOptions.map((option, index) => (
                                 <TouchableOpacity
                                     key={index}
                                     style={styles.optionButton}
