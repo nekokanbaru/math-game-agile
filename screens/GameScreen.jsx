@@ -9,9 +9,12 @@ const GameScreen = ({ route, navigation }) => {
     const [feedback, setFeedback] = useState('');
     const [feedbackColor, setFeedbackColor] = useState('black');
     const [lives, setLives] = useState([true, true, true]);
+    const [gameFailed, setGameFailed] = useState(false);
     const [gameOver, setGameOver] = useState(false);
+    const [gamePaused, setGamePaused] = useState(false);
     const [shuffledOptions, setShuffledOptions] = useState([]); // State to store shuffled options
     const [timer, setTimer] = useState(120); // Set initial time to 2 minutes (120 seconds)
+    const [paused, setPaused] = useState(false); // Pause timer
 
     const currentQuestion = questions[currentQuestionIndex];
 
@@ -33,23 +36,39 @@ const GameScreen = ({ route, navigation }) => {
         setFeedbackColor('black');
     }, [currentQuestionIndex]);
 
+    //If the hearts run out pause the timer and end the level
+    useEffect(() => {
+        if(lives.every(life => !life)){
+            setPaused(true);
+            setGameFailed(true);
+        }
+    }, [lives])
+
+    useEffect(() => {
+        if(gameOver || gameFailed)
+            setPaused(true);
+    }, [gameOver, gameFailed])
+
     // Start and manage the timer
     useEffect(() => {
         const timerInterval = setInterval(() => {
-            setTimer(prevTime => {
-                if (prevTime <= 1) {
-                    clearInterval(timerInterval);
-                    setGameOver(true);
-                    setFeedback('Time’s up!');
-                    return 0; // Timer reached 0, game over
-                }
-                return prevTime - 1; // Decrement timer
-            });
+            if(!paused && !gamePaused){
+                setTimer(prevTime => {
+                    if (prevTime <= 1) {
+                        clearInterval(timerInterval);
+                        setGameOver(true);
+                        setGameFailed(true);
+                        setFeedback('Time’s up!');
+                        return 0; // Timer reached 0, game over
+                    }
+                    return prevTime - 1; // Decrement timer
+                });
+            }
         }, 1000); // Update every second
 
         // Clean up the interval when the component unmounts or game ends
         return () => clearInterval(timerInterval);
-    }, []);
+    }, [paused, gamePaused]);
 
     const handleAnswer = (selectedOption) => {
         if (selectedOption === currentQuestion.answer) {
@@ -102,6 +121,8 @@ const GameScreen = ({ route, navigation }) => {
 
             // Reset the game over state for the next level
             setGameOver(false);
+            setGameFailed(false);
+            setPaused(false);
 
             // Reset the timer to 2 minutes for the next level
             setTimer(120);
@@ -138,14 +159,38 @@ const GameScreen = ({ route, navigation }) => {
             source={require('../assets/images/mathgame.png')}
             style={styles.background}
         >
+            {/* Pause screen */}
+            {gamePaused && <View style={styles.pauseScreen}>
+                <Text style={styles.pausedText}>PAUSED</Text>
+                <TouchableOpacity
+                    style={styles.pausedButton}
+                    onPress={() => setGamePaused(false)}
+                >
+                    <Text style={styles.buttonText}>Resume</Text>
+                </TouchableOpacity>
+                <TouchableOpacity
+                    style={styles.pausedButton}
+                    onPress={() => handleLevelSelection()}
+                >
+                    <Text style={styles.buttonText}>Level selection</Text>
+                </TouchableOpacity>
+                <TouchableOpacity
+                    style={styles.pausedButton}
+                    onPress={() => handleBackToHome()}
+                >
+                    <Text style={styles.buttonText}>Back to home</Text>
+                </TouchableOpacity>
+            </View>}
             {/* Top Section: Hearts, Pause Icon, Score, Timer */}
             <View style={styles.pauseHeartContainer}>
                 <View>
-                    <Image
-                        style={styles.pauseImage}
-                        source={require('../assets/images/pause.png')}
-                        resizeMode="cover"
-                    />
+                    <TouchableOpacity onPress={() => setGamePaused(true)}>
+                        <Image
+                            style={styles.pauseImage}
+                            source={require('../assets/images/pause.png')}
+                            resizeMode="cover"
+                        />
+                    </TouchableOpacity>
                 </View>
                 <View style={{ flexDirection: 'row' }}>
                     {lives.map((life, index) => (
@@ -177,9 +222,16 @@ const GameScreen = ({ route, navigation }) => {
 
             {/* Main Game Section: Question and Options */}
             <View style={styles.container}>
-                {gameOver || lives.every(life => !life) ? (
+                {gameOver || lives.every(life => !life) || gameFailed ? (
                     <View style={styles.endGameContainer}>
-                        <Text style={styles.feedback}>{lives.every(life => !life) ? 'Level Failed!' : 'Level Complete!'}</Text>
+                        <Text
+                            style={[
+                                styles.feedback,
+                                { color: lives.every(life => !life) || gameFailed ? 'red' : 'green' }
+                            ]}
+                        >
+                            {lives.every(life => !life) || gameFailed ? 'Level Failed!' : 'Level Complete!'}
+                        </Text>
                         <View style={styles.buttonContainer}>
                             <TouchableOpacity
                                 style={styles.button}
@@ -188,11 +240,11 @@ const GameScreen = ({ route, navigation }) => {
                                 <Text style={styles.buttonText}>Level Selection</Text>
                             </TouchableOpacity>
                             <TouchableOpacity
-                                style={[styles.button, level === 5 && styles.disabledButton]}
+                                style={[styles.button, (level === 5 || gameFailed) && styles.disabledButton]}
                                 onPress={handleNextLevel}
-                                disabled={level === 5}
+                                disabled={level === 5 || lives.every(life => !life) || gameFailed}
                             >
-                                <Text style={styles.buttonText} disabled={lives.every(life => !life)}>Next Level</Text>
+                                <Text style={[styles.buttonText, (level === 5 || gameFailed) && styles.disabledButtonText]}>Next Level</Text>
                             </TouchableOpacity>
                         </View>
                         <TouchableOpacity
@@ -241,6 +293,34 @@ const styles = StyleSheet.create({
         resizeMode: 'cover',
         justifyContent: 'center',
     },
+    pauseScreen: {
+        display: 'flex',
+        flexDirection: 'column',
+        justifyContent: 'center',
+        alignItems: 'center',
+        backgroundColor: '#cfd4dd',
+        position: 'absolute',
+        top: '25%',
+        left: '10%',
+        width: '80%',
+        height: '50%',
+        zIndex:2,
+        gap: 30,
+        borderRadius: 20
+    },
+    pausedText: {
+        textAlign: 'center',
+        fontSize: 44,
+        color:'#18244a',
+        fontWeight: 'bold',
+        letterSpacing: 2
+    },
+    pausedButton: {
+        backgroundColor: '#18244a',
+        color: '#cfd4dd',
+        width: 200,
+        paddingVertical: 10
+    },
     feedback: {
         fontSize: 44,
         fontWeight: 'bold',
@@ -264,7 +344,7 @@ const styles = StyleSheet.create({
     },
     optionButton: {
         width: '30%',
-        backgroundColor: 'transparent',
+        backgroundColor: '#002248',
         borderWidth: 2,
         borderColor: '#fff',
         margin: 30,
@@ -279,11 +359,12 @@ const styles = StyleSheet.create({
     pauseHeartContainer: {
         flexDirection: 'row',
         justifyContent: 'space-between',
-        padding: 10,
+        padding: 20,
     },
     heartImage: {
         width: 60,
         height: 60,
+        marginEnd: 10,
     },
     pauseImage: {
         width: 60,
@@ -323,19 +404,31 @@ const styles = StyleSheet.create({
         marginTop: 20,
     },
     button: {
-        backgroundColor: '#4CAF50',
-        padding: 15,
-        borderRadius: 10,
-        marginTop: 20,
+        width: 150,
+        padding: 5,
+        backgroundColor: '#002248', // Transparent white background
+        borderWidth: 3,
+        borderColor: "#FFF",
+        borderRadius: 5,
+        marginBottom: 20,
+        alignItems: "center",  // Glow color
+        shadowOpacity: 0.5,   // Strength of the glow
+        shadowRadius: 1,     // Spread of the glow
+        elevation: 1,       // For Android shadow
+        paddingVertical: 10,
     },
     buttonText: {
         color: 'white',
         fontSize: 20,
         fontFamily: 'BebasNeue-Regular',
+        textAlign: 'center'
     },
     disabledButton: {
-        backgroundColor: '#cccccc',
+        borderColor: "gray",
     },
+    disabledButtonText: {
+        color: 'gray',
+    }
 });
 
 export default GameScreen;
