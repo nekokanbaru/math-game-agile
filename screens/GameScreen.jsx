@@ -15,6 +15,7 @@ const GameScreen = ({ route, navigation }) => {
     const [shuffledOptions, setShuffledOptions] = useState([]); // State to store shuffled options
     const [timer, setTimer] = useState(120); // Set initial time to 2 minutes (120 seconds)
     const [paused, setPaused] = useState(false); // Pause timer
+    const [score, setScore] = useState(0);
 
     const currentQuestion = questions[currentQuestionIndex];
 
@@ -74,9 +75,11 @@ const GameScreen = ({ route, navigation }) => {
         if (selectedOption === currentQuestion.answer) {
             setFeedback('Correct!');
             setFeedbackColor('green');
+            setScore(score + 100)
         } else {
             setFeedback('Incorrect.');
             setFeedbackColor('red');
+            setScore(score - 200)
             removeLife();
         }
 
@@ -87,6 +90,7 @@ const GameScreen = ({ route, navigation }) => {
             } else {
                 // If all questions are used, handle end of level
                 setGameOver(true);
+                setScore(score + (timer * lives.length));
             }
         }, 1000);
     };
@@ -215,7 +219,7 @@ const GameScreen = ({ route, navigation }) => {
 
             <View style={styles.pauseHeartContainer}>
                 <View style={styles.scoreContainer}>
-                    <Text style={styles.scoreStopwatchText}>Score: 31</Text>
+                    <Text style={styles.scoreStopwatchText}>Score: {score}</Text>
                 </View>
                 <View style={styles.stopwatchContainer}>
                     <Image
@@ -237,7 +241,7 @@ const GameScreen = ({ route, navigation }) => {
                                 { color: lives.every(life => !life) || gameFailed ? 'red' : 'green' }
                             ]}
                         >
-                            {lives.every(life => !life) || gameFailed ? 'Level Failed!' : 'Level Complete!'}
+                            {lives.every(life => !life) || gameFailed ? 'Level Failed!' : `Level Complete! Score: ${score}`}
                         </Text>
                         <View style={styles.buttonContainer}>
                             <TouchableOpacity
