@@ -101,12 +101,21 @@ const GameScreen = ({ route, navigation }) => {
     };
 
     const handleLevelSelection = () => {
+        resetGame();
         navigation.navigate('SelectLevel', { difficulty: difficulty });
     };
 
     const handleBackToHome = () => {
+        resetGame();
         navigation.navigate('Home');
     };
+
+    const resetGame = () => {
+        setGameOver(false);
+            setGameFailed(false);
+            setPaused(false);
+            setLives([true, true, true]);
+    }
 
     const handleNextLevel = () => {
         if (level < 5) {
@@ -120,9 +129,7 @@ const GameScreen = ({ route, navigation }) => {
             setCurrentQuestionIndex(0);
 
             // Reset the game over state for the next level
-            setGameOver(false);
-            setGameFailed(false);
-            setPaused(false);
+            resetGame();
 
             // Reset the timer to 2 minutes for the next level
             setTimer(120);
