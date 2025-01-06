@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { View, Text, StyleSheet, ImageBackground, Image, TouchableOpacity } from 'react-native';
 import * as Animatable from 'react-native-animatable';
+import { getHighScoreForLevel, updateHighScoreForLevel } from '../utils/storage/highScoreUtils';
 
 const GameScreen = ({ route, navigation }) => {
     const { questions, level, difficulty } = route.params; // Get the questions and level from SelectLevel screen
@@ -16,6 +17,8 @@ const GameScreen = ({ route, navigation }) => {
     const [timer, setTimer] = useState(120); // Set initial time to 2 minutes (120 seconds)
     const [paused, setPaused] = useState(false); // Pause timer
     const [score, setScore] = useState(0);
+    const [currentScore, setCurrentScore] = useState(0);
+    const [highScore, setHighScore] = useState(0);  
 
     const currentQuestion = questions[currentQuestionIndex];
 
@@ -27,6 +30,15 @@ const GameScreen = ({ route, navigation }) => {
         }
         return array;
     }
+
+    useEffect(() => {
+        const loadHighScore = () => {
+            const score = getHighScoreForLevel(difficulty, level);
+            setHighScore(score);
+        };
+    
+        loadHighScore();
+    }, [difficulty, level]);
 
     // Shuffle the options whenever the current question changes
     useEffect(() => {
@@ -75,22 +87,44 @@ const GameScreen = ({ route, navigation }) => {
         if (selectedOption === currentQuestion.answer) {
             setFeedback('Correct!');
             setFeedbackColor('green');
-            setScore(score + 100)
+            const newScore = score + 100;
+            setScore(newScore);
+    
+            // Check and update the high score if the new score is higher
+            if (newScore > highScore) {
+                updateHighScoreForLevel(difficulty, level, score);
+                setHighScore(score);
+            }
         } else {
             setFeedback('Incorrect.');
             setFeedbackColor('red');
-            setScore(score - 200)
+            const newScore = score - 200;
+            setScore(newScore);
+    
+            // Check and update the high score if the new score is higher
+            if (newScore > highScore) {
+                updateHighScoreForLevel(difficulty, level, score);
+                setHighScore(newScore);
+            }
+    
             removeLife();
         }
-
+    
         setTimeout(() => {
             const nextIndex = currentQuestionIndex + 1;
             if (nextIndex < questions.length) {
                 setCurrentQuestionIndex(nextIndex);
             } else {
-                // If all questions are used, handle end of level
+                // End of level logic
                 setGameOver(true);
-                setScore(score + (timer * lives.length));
+                const finalScore = score + (timer * lives.filter(Boolean).length);
+                setScore(finalScore);
+
+                if (finalScore > highScore) {
+                    updateHighScoreForLevel(difficulty, level, finalScore);
+                    setHighScore(finalScore);
+                }
+
             }
         }, 1000);
     };
@@ -241,7 +275,7 @@ const GameScreen = ({ route, navigation }) => {
                                 { color: lives.every(life => !life) || gameFailed ? 'red' : 'green' }
                             ]}
                         >
-                            {lives.every(life => !life) || gameFailed ? 'Level Failed!' : `Level Complete! Score: ${score}`}
+                            {lives.every(life => !life) || gameFailed ? 'Level Failed!' : `Level Complete! Score: ${score} High Score: ${highScore}`}
                         </Text>
                         <View style={styles.buttonContainer}>
                             <TouchableOpacity
