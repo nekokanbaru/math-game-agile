@@ -22,7 +22,7 @@ const HomeScreen = ({ navigation }) => {
           onPress={() => navigation.navigate('Difficulty')} style={styles.button}>
           <Text style={styles.buttonText}>START</Text>
         </TouchableOpacity>
-        <TouchableOpacity style={styles.button}>
+        <TouchableOpacity onPress={() => navigation.navigate('Leaderboard')} style={styles.button}>
           <Text style={styles.buttonText}>SCOREBOARD</Text>
         </TouchableOpacity>
       </View>
