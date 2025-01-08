@@ -1,12 +1,20 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { View, Text, TouchableOpacity, StyleSheet, ScrollView, ImageBackground } from 'react-native';
+import { getAllUsersWithScores, getCurrentUser, getTotalHighScore } from '../utils/storage/highScoreUtils'; // Updated function
 
 const LeaderboardScreen = ({ navigation }) => {
-  // Mock leaderboard data
-  const leaderboardData = Array(10).fill(null).map((_, index) => ({
-    username: 'USERNAME',
-    score: 1312,
-  }));
+  const [leaderboardData, setLeaderboardData] = useState([]);
+
+  // Fetch leaderboard data on mount
+  useEffect(() => {
+    const fetchLeaderboardData = () => {
+      const usersWithScores = getAllUsersWithScores();
+      const sortedUsers = usersWithScores.sort((a, b) => b.score - a.score); // Sort by highest score
+      setLeaderboardData(sortedUsers);
+    };
+
+    fetchLeaderboardData();
+  }, []);
 
   const handleBackToHome = () => {
     navigation.navigate('Home');
@@ -16,17 +24,17 @@ const LeaderboardScreen = ({ navigation }) => {
     <ImageBackground
       source={require('../assets/images/mathgame.png')}
       style={styles.container}>
-      {/* Fixed Title */}
+      {/* Header */}
       <View style={styles.header}>
         <TouchableOpacity
           style={styles.backButton}
-          onPress={() => handleBackToHome()}>
+          onPress={handleBackToHome}>
           <Text style={styles.backButtonText}>Back</Text>
         </TouchableOpacity>
         <Text style={styles.headerText}>LEADERBOARD</Text>
       </View>
 
-      {/* Scrollable Leaderboard */}
+      {/* Leaderboard */}
       <ScrollView style={styles.leaderboardContainer}>
         {leaderboardData.map((item, index) => (
           <View key={index} style={styles.leaderboardRow}>
@@ -38,10 +46,14 @@ const LeaderboardScreen = ({ navigation }) => {
         ))}
       </ScrollView>
 
-      {/* Fixed Footer */}
+      {/* Footer */}
       <View style={styles.footer}>
-        <Text style={styles.footerText}>Your Best Score: 1234</Text>
-        <Text style={styles.footerText}>Your Place: 92</Text>
+        <Text style={styles.footerText}>
+          Your Best Score: {getTotalHighScore()}
+        </Text>
+        <Text style={styles.footerText}>
+          Your Place: {leaderboardData.findIndex(user => user.username === getCurrentUser()) + 1 + '.' || 'N/A'}
+        </Text>
       </View>
     </ImageBackground>
   );
@@ -67,7 +79,6 @@ const styles = StyleSheet.create({
     borderTopWidth: 5,
     borderBottomWidth: 5,
     borderColor: '#cfd4dd',
-    borderStyle: 'solid',
     width: '95%',
     alignSelf: 'center',
   },
@@ -94,16 +105,16 @@ const styles = StyleSheet.create({
   backButton: {
     width: 100,
     padding: 5,
-    backgroundColor: '#002248', // Transparent white background
+    backgroundColor: '#002248',
     borderWidth: 3,
     borderColor: '#FFF',
     borderRadius: 5,
     marginBottom: 20,
     marginLeft: 30,
-    alignItems: 'center', // Glow color
-    shadowOpacity: 0.5, // Strength of the glow
-    shadowRadius: 1, // Spread of the glow
-    elevation: 1, // For Android shadow
+    alignItems: 'center',
+    shadowOpacity: 0.5,
+    shadowRadius: 1,
+    elevation: 1,
   },
   backButtonText: {
     color: '#cfd4dd',

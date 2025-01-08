@@ -172,6 +172,9 @@ const GameScreen = ({ route, navigation }) => {
             // Reset the timer to 2 minutes for the next level
             setTimer(120);
 
+            // Reset the score to 0 for the next level
+            setScore(0);
+
             // Navigate to the Game screen with the next level and its questions
             navigation.navigate('Game', {
                 questions: nextQuestions,

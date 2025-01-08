@@ -1,7 +1,25 @@
-import React from "react";
-import { StyleSheet, Text, View, ImageBackground, TouchableOpacity, Image } from "react-native";
+import React, { useState, useEffect } from "react";
+import { StyleSheet, Text, View, ImageBackground, TextInput, TouchableOpacity, Image } from "react-native";
+import { getCurrentUser, addUser, setCurrentUser } from "../utils/storage/highScoreUtils";
 
 const HomeScreen = ({ navigation }) => {
+  const [username, setUsername] = useState("");
+  const [currentUser, setLocalCurrentUser] = useState("");
+
+  // Initialize with the current user
+  useEffect(() => {
+    const user = getCurrentUser();
+    setLocalCurrentUser(user);
+    setUsername(user); // Pre-fill with the current username
+  }, []);
+
+  const handleUsernameChange = () => {
+    if (username.trim() !== "") {
+      addUser(username); // Add or switch to the new user
+      setLocalCurrentUser(username); // Update locally
+    }
+  };
+
   return (
     <ImageBackground
       source={require('../assets/images/mathgame.png')}
@@ -11,13 +29,28 @@ const HomeScreen = ({ navigation }) => {
         {/* Text with outline */}
         <Text style={[styles.title, styles.titleOutline]}>MATH</Text>
         <Text style={[styles.title, styles.titleOutline]}>GAME</Text>
-        <View style={styles.profileImageContainer}>
-          <Image
-            style={styles.profileImage}
-            source={require('../user.png')}
-            resizeMode="cover"
-          />
-        </View>
+        {/* Username Input Section */}
+        {currentUser ? (
+          <>
+            <Text style={styles.greeting}>Hi, {currentUser}!</Text>
+            <TouchableOpacity onPress={() => setLocalCurrentUser("")} style={styles.button}>
+              <Text style={styles.userButtonText}>CHANGE USERNAME</Text>
+            </TouchableOpacity>
+          </>
+        ) : (
+          <>
+            <TextInput
+              style={styles.input}
+              placeholder="Enter your username"
+              placeholderTextColor="#cfd4dd"
+              value={username}
+              onChangeText={setUsername}
+            />
+            <TouchableOpacity onPress={handleUsernameChange} style={styles.button}>
+              <Text style={styles.userButtonText}>CONFIRM USERNAME</Text>
+            </TouchableOpacity>
+          </>
+        )}
         <TouchableOpacity title="Play"
           onPress={() => navigation.navigate('Difficulty')} style={styles.button}>
           <Text style={styles.buttonText}>START</Text>
@@ -70,11 +103,34 @@ const styles = StyleSheet.create({
     shadowRadius: 1,     // Spread of the glow
     elevation: 1,        // For Android shadow
   },
+  userButtonText: {
+    color: "#cfd4dd",
+    fontSize: 30,
+    fontFamily: "BebasNeue-Regular",
+  },
   buttonText: {
     color: "#cfd4dd",
     fontSize: 50,
     fontFamily: "BebasNeue-Regular",
-  }
+  },
+  greeting: {
+    fontSize: 34,
+    color: "#cfd4dd",
+    marginBottom: 20,
+    fontFamily: "BebasNeue-Regular",
+  },
+  input: {
+    width: 300,
+    height: 50,
+    borderColor: "#cfd4dd",
+    borderWidth: 2,
+    borderRadius: 5,
+    padding: 10,
+    marginBottom: 20,
+    color: "#cfd4dd",
+    fontSize: 20,
+    fontFamily: "BebasNeue-Regular",
+  },
 });
 
 export default HomeScreen;
