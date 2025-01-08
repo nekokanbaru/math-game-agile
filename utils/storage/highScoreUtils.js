@@ -1,6 +1,7 @@
 import { storage } from './storage';
 
 const HIGH_SCORES_KEY = 'math_game_high_scores';
+const TOTAL_HIGH_SCORES_KEY = 'math_game_total_high_scores'
 
 // Initialize high scores structure if not already set
 const initializeHighScores = () => {
@@ -22,13 +23,42 @@ const initializeHighScores = () => {
 export const getAllHighScores = () => {
   try {
     const scores = storage.getString(HIGH_SCORES_KEY);
+    const total = storage.getString(TOTAL_HIGH_SCORES_KEY)
     console.log("scores: ", scores)
+    console.log("total: ", total)
     return scores ? JSON.parse(scores) : null;
   } catch (error) {
     console.error('Error retrieving high scores:', error);
     return null;
   }
 };
+
+export const getTotalHighScore = () => {
+  try {
+    const scores = storage.getString(HIGH_SCORES_KEY);
+    if(!scores){
+      console.error('No scores found in storage');
+      return null;
+    }
+
+    const parsedScores = JSON.parse(scores);
+    let totalHighScore = 0;
+
+    Object.values(parsedScores).forEach((levels) => {
+      Object.values(levels).forEach((score) => {
+        totalHighScore += score;
+      })
+    })
+
+    storage.set(TOTAL_HIGH_SCORES_KEY, JSON.stringify(totalHighScore));
+    console.log("stringified: ", JSON.stringify(totalHighScore))
+
+  }
+  catch (error) {
+    console.error('Error calculating total high score: ', error);
+    return null;
+  }
+}
 
 // Get high score for a specific level and difficulty
 export const getHighScoreForLevel = (difficulty, level) => {
@@ -41,6 +71,7 @@ export const getHighScoreForLevel = (difficulty, level) => {
 // Save updated high scores
 const saveHighScores = (scores) => {
   try {
+    getTotalHighScore();
     storage.set(HIGH_SCORES_KEY, JSON.stringify(scores));
   } catch (error) {
     console.error('Error saving high scores:', error);
