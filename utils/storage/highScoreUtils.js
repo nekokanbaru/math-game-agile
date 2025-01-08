@@ -1,4 +1,7 @@
 import { storage } from './storage';
+import { db } from '../../firebase/firebaseInit';
+import { collection, addDoc, getDocs, query, orderBy, limit } from 'firebase/firestore';
+
 
 const HIGH_SCORES_KEY = 'math_game_high_scores'; // Legacy support
 const USERS_KEY = 'math_game_users';
@@ -88,6 +91,10 @@ export const updateHighScoreForLevel = (difficulty, level, newScore) => {
     if (newScore > users[currentUser][difficulty][level]) {
       users[currentUser][difficulty][level] = newScore;
       saveUsers(users);
+
+      // Add the new score to the global leaderboard
+      const totalScore = getTotalHighScore(); // Recalculate total score
+      addGlobalScore(currentUser, totalScore);
     }
   } else {
     console.error(`Invalid difficulty or level: ${difficulty} -> ${level}`);
@@ -99,6 +106,37 @@ export const getTotalHighScore = () => {
   const scores = getAllHighScores();
   return Object.values(scores).reduce((total, levels) =>
     total + Object.values(levels).reduce((sum, score) => sum + score, 0), 0);
+};
+
+// Add a user's score to the global leaderboard
+export const addGlobalScore = async (username, score) => {
+  try {
+    console.log(db)
+    await addDoc(collection(db, "scoreboard"), {
+      username,
+      score,
+      timestamp: new Date(),
+    });
+  } catch (error) {
+    console.error("Error adding global score:", error);
+  }
+};
+
+// Fetch top N scores from the global leaderboard
+export const getGlobalLeaderboard = async (limitCount = 10) => {
+  try {
+    const leaderboardRef = collection(db, "scoreboard");
+    const q = query(leaderboardRef, orderBy("score", "desc"), limit(limitCount));
+    const querySnapshot = await getDocs(q);
+
+    return querySnapshot.docs.map((doc) => ({
+      id: doc.id,
+      ...doc.data(),
+    }));
+  } catch (error) {
+    console.error("Error fetching global leaderboard:", error);
+    return [];
+  }
 };
 
 // Initialize users on app start
