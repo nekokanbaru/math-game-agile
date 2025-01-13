@@ -1,6 +1,6 @@
 import { storage } from "./storage";
 import { db } from "../../firebase/firebaseInit";
-import { collection, addDoc, getDocs, query, orderBy, limit } from "firebase/firestore";
+import { collection, addDoc, getDocs, query, orderBy, limit, collectionGroup } from "firebase/firestore";
 import {
   updateHighScoreForLevel as firebaseUpdateHighScoreForLevel,
   getHighScoresForUser,
@@ -129,16 +129,62 @@ export const addGlobalScore = async (username, score) => {
 };
 
 // Fetch top N scores from the global leaderboard
+
 export const getGlobalLeaderboard = async (limitCount = 10) => {
   try {
-    const leaderboardRef = collection(db, "scoreboard");
-    const q = query(leaderboardRef, orderBy("score", "desc"), limit(limitCount));
-    const querySnapshot = await getDocs(q);
+    const leaderboard = [];
 
-    return querySnapshot.docs.map((doc) => ({
-      id: doc.id,
-      ...doc.data(),
-    }));
+    // Query all the 'users' collection
+    const usersRef = collection(db, "users");
+    const usersSnapshot = await getDocs(usersRef);
+
+    if (usersSnapshot.empty) {
+      console.warn("No users found.");
+      return [];
+    }
+
+    // Calculate total score for each user
+    const userScoresMap = {}; // Keep track of total scores for each user
+
+    // Loop through all users
+    for (const userDoc of usersSnapshot.docs) {
+      const username = userDoc.id; // Get the username (document ID)
+      const scoresData = userDoc.data().scores; // Access the 'scores' field
+
+      // Check if 'scores' exists
+      if (!scoresData) {
+        console.log(`No scores found for user: ${username}`);
+        continue;
+      }
+
+      let totalScore = 0;
+
+      // Sum up the scores for each difficulty (easy, medium, hard, expert)
+      for (const difficulty of ['easy', 'medium', 'hard', 'expert']) {
+        const levels = scoresData[difficulty]; // Get the levels map for the difficulty
+        if (levels) {
+          // Sum up the levels' scores
+          totalScore += Object.values(levels).reduce((sum, score) => sum + score, 0);
+        }
+      }
+
+      // Store the user's total score
+      userScoresMap[username] = totalScore;
+    }
+
+    // Prepare leaderboard with the total score for each user
+    Object.keys(userScoresMap).forEach((username) => {
+      leaderboard.push({
+        username,
+        score: userScoresMap[username],
+      });
+    });
+
+    // Sort the leaderboard by total score in descending order
+    leaderboard.sort((a, b) => b.score - a.score);
+
+    // Return the top N users based on the limit
+    return leaderboard.slice(0, limitCount);
   } catch (error) {
     console.error("Error fetching global leaderboard:", error);
     return [];
