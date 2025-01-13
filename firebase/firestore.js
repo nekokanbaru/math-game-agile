@@ -1,36 +1,77 @@
-import { getFirestore, collection, addDoc, query, orderBy, limit, getDocs } from "firebase/firestore";
-import app from "./firebaseConfig";
+import { doc, getDoc, setDoc, updateDoc, collection, getDocs, getFirestore } from "firebase/firestore";
+import { db } from "./firebaseInit";
 
-// Initialize Firestore
-const db = getFirestore(app);
-
-// Function to add a user's score to the database
-export const addScore = async (username, score) => {
+// Update highscore for a specific levelrr
+export const updateHighScoreForLevel = async (username, difficulty, level, newScore) => {
   try {
-    await addDoc(collection(db, "scoreboard"), {
-      username,
-      score,
-    });
-    console.log("Score added successfully!");
+    const userRef = doc(db, "users", username); // Use username as document ID
+    const userDoc = await getDoc(userRef);
+
+    const defaultScores = {
+      easy: { 1: 0, 2: 0, 3: 0, 4: 0, 5: 0 },
+      medium: { 1: 0, 2: 0, 3: 0, 4: 0, 5: 0 },
+      hard: { 1: 0, 2: 0, 3: 0, 4: 0, 5: 0 },
+      expert: { 1: 0, 2: 0, 3: 0, 4: 0, 5: 0 }
+    };
+
+    if (!userDoc.exists()) {
+      // Create the document if it doesn't exist
+      await setDoc(userRef, {
+        username,
+        scores: defaultScores
+      });
+    }
+
+    // Update the score only if it's higher than the current one
+    const currentScores = userDoc.exists() ? userDoc.data().scores : defaultScores;
+    if (!currentScores[difficulty][level] || newScore > currentScores[difficulty][level]) {
+      currentScores[difficulty][level] = newScore;
+
+      await updateDoc(userRef, { scores: currentScores });
+    } else {
+      console.log("Score not high enough to update.");
+    }
   } catch (error) {
-    console.error("Error adding score: ", error);
+    console.error("Error updating highscore: ", error);
   }
 };
 
-// Function to fetch the top scores from the leaderboard
-export const getTopScores = async (limitCount = 10) => {
+// Fetch all highscores for a user
+export const getHighScoresForUser = async (username) => {
   try {
-    const q = query(collection(db, "scoreboard"), orderBy("score", "desc"), limit(limitCount));
-    const querySnapshot = await getDocs(q);
+    const userRef = doc(db, "users", username);
+    const userDoc = await getDoc(userRef);
 
+    if (userDoc.exists()) {
+      return userDoc.data().scores;
+    } else {
+      console.error("User not found.");
+      return null;
+    }
+  } catch (error) {
+    console.error("Error fetching highscores: ", error);
+    return null;
+  }
+};
+
+// Fetch global leaderboard
+export const getGlobalLeaderboard = async (limitCount = 10) => {
+  try {
+    const usersSnapshot = await getDocs(collection(db, "users"));
     const leaderboard = [];
-    querySnapshot.forEach((doc) => {
-      leaderboard.push({ id: doc.id, ...doc.data() });
+
+    usersSnapshot.forEach((doc) => {
+      const user = doc.data();
+      const totalScore = Object.values(user.scores).reduce((total, levels) =>
+        total + Object.values(levels).reduce((sum, score) => sum + score, 0), 0
+      );
+
+      leaderboard.push({ username: user.username, totalScore });
     });
 
-    return leaderboard;
+    return leaderboard.sort((a, b) => b.totalScore - a.totalScore).slice(0, limitCount);
   } catch (error) {
-    console.error("Error fetching leaderboard: ", error);
+    console.error("Error fetching global leaderboard: ", error);
     return [];
   }
-};
+}

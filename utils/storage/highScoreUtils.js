@@ -1,36 +1,42 @@
-import { storage } from './storage';
-import { db } from '../../firebase/firebaseInit';
-import { collection, addDoc, getDocs, query, orderBy, limit } from 'firebase/firestore';
+import { storage } from "./storage";
+import { db } from "../../firebase/firebaseInit";
+import { collection, addDoc, getDocs, query, orderBy, limit } from "firebase/firestore";
+import {
+  updateHighScoreForLevel as firebaseUpdateHighScoreForLevel,
+  getHighScoresForUser,
+  getGlobalLeaderboard as firebaseGetGlobalLeaderboard,
+} from "../../firebase/firestore";
 
-
-const HIGH_SCORES_KEY = 'math_game_high_scores'; // Legacy support
-const USERS_KEY = 'math_game_users';
-const CURRENT_USER_KEY = 'math_game_current_user';
+const HIGH_SCORES_KEY = "math_game_high_scores"; // Legacy support
+const USERS_KEY = "math_game_users";
+const CURRENT_USER_KEY = "math_game_current_user";
 
 // Default high scores structure
 const defaultScores = {
-  "easy": { "1": 0, "2": 0, "3": 0, "4": 0, "5": 0 },
-  "medium": { "1": 0, "2": 0, "3": 0, "4": 0, "5": 0 },
-  "hard": { "1": 0, "2": 0, "3": 0, "4": 0, "5": 0 },
-  "expert": { "1": 0, "2": 0, "3": 0, "4": 0, "5": 0 }
+  easy: { 1: 0, 2: 0, 3: 0, 4: 0, 5: 0 },
+      medium: { 1: 0, 2: 0, 3: 0, 4: 0, 5: 0 },
+      hard: { 1: 0, 2: 0, 3: 0, 4: 0, 5: 0 },
+      expert: { 1: 0, 2: 0, 3: 0, 4: 0, 5: 0 }
 };
 
 // Initialize users structure if not already set
-const initializeUsers = () => {
+const initializeUsers = async () => {
   if (!storage.getString(USERS_KEY)) {
     storage.set(USERS_KEY, JSON.stringify({}));
   }
   if (!storage.getString(CURRENT_USER_KEY)) {
-    storage.set(CURRENT_USER_KEY, 'default'); // Set a default user
-    addUser('default'); // Create the default user
+    storage.set(CURRENT_USER_KEY, "default"); // Set a default user
+    addUser("default"); // Create the default user
   }
 };
 
 // Add a new user
-export const addUser = (username) => {
+export const addUser = async (username) => {
   const users = getAllUsers();
   if (!users[username]) {
-    users[username] = { ...defaultScores }; // Initialize high scores for the new user
+    // Initialize Firebase user data
+    await firebaseUpdateHighScoreForLevel(username, "easy", 1, 0); // Initialize Firebase user if not found
+    users[username] = { ...defaultScores }; // Initialize scores locally
     saveUsers(users);
   }
   setCurrentUser(username);
@@ -45,8 +51,9 @@ export const getAllUsers = () => {
 export const getAllUsersWithScores = () => {
   const users = getAllUsers(); // Retrieve all users
   const usersWithScores = Object.entries(users).map(([username, scores]) => {
-    const totalScore = Object.values(scores).reduce((total, levels) => 
-      total + Object.values(levels).reduce((sum, score) => sum + score, 0), 0);
+    const totalScore = Object.values(scores).reduce((total, levels) =>
+      total + Object.values(levels).reduce((sum, score) => sum + score, 0)
+    , 0);
     return { username, score: totalScore };
   });
   return usersWithScores;
@@ -58,9 +65,7 @@ const saveUsers = (users) => {
 };
 
 // Get the current user
-export const getCurrentUser = () => {
-  return storage.getString(CURRENT_USER_KEY);
-};
+export const getCurrentUser = () => storage.getString(CURRENT_USER_KEY);
 
 // Set the current user
 export const setCurrentUser = (username) => {
@@ -77,23 +82,24 @@ export const getAllHighScores = () => {
 // Get high score for a specific level and difficulty for the current user
 export const getHighScoreForLevel = (difficulty, level) => {
   const scores = getAllHighScores();
-  return scores[difficulty] && scores[difficulty][level] !== undefined
-    ? scores[difficulty][level]
-    : 0; // Default to 0 if not found
+  return scores[difficulty]?.[level] ?? 0; // Default to 0 if not found
 };
 
 // Update high score for a specific level and difficulty for the current user
-export const updateHighScoreForLevel = (difficulty, level, newScore) => {
+export const updateHighScoreForLevel = async (difficulty, level, newScore) => {
   const currentUser = getCurrentUser();
   const users = getAllUsers();
 
-  if (users[currentUser] && users[currentUser][difficulty] && users[currentUser][difficulty][level] !== undefined) {
-    if (newScore > users[currentUser][difficulty][level]) {
+  if (users[currentUser]?.[difficulty]?.[level] !== undefined) {
+    const currentScore = users[currentUser][difficulty][level];
+    if (newScore > currentScore) {
+      // Update local storage
       users[currentUser][difficulty][level] = newScore;
       saveUsers(users);
 
-      // Add the new score to the global leaderboard
-      const totalScore = getTotalHighScore(); // Recalculate total score
+      // Recalculate total score and sync with global leaderboard
+      const totalScore = getTotalHighScore();
+      await firebaseUpdateHighScoreForLevel(currentUser, difficulty, level, newScore);
       addGlobalScore(currentUser, totalScore);
     }
   } else {
@@ -105,13 +111,13 @@ export const updateHighScoreForLevel = (difficulty, level, newScore) => {
 export const getTotalHighScore = () => {
   const scores = getAllHighScores();
   return Object.values(scores).reduce((total, levels) =>
-    total + Object.values(levels).reduce((sum, score) => sum + score, 0), 0);
+    total + Object.values(levels).reduce((sum, score) => sum + score, 0)
+  , 0);
 };
 
 // Add a user's score to the global leaderboard
 export const addGlobalScore = async (username, score) => {
   try {
-    console.log(db)
     await addDoc(collection(db, "scoreboard"), {
       username,
       score,

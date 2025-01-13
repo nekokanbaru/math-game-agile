@@ -32,9 +32,14 @@ const GameScreen = ({ route, navigation }) => {
     }
 
     useEffect(() => {
-        const loadHighScore = () => {
-            const score = getHighScoreForLevel(difficulty, level);
-            setHighScore(score);
+        const loadHighScore = async () => {
+            try {
+                const score = await getHighScoreForLevel(difficulty, level);
+                
+                setHighScore(score || 0); // Default to 0 if no high score exists
+            } catch (error) {
+                console.error('Failed to load high score:', error);
+            }
         };
     
         loadHighScore();
@@ -83,48 +88,45 @@ const GameScreen = ({ route, navigation }) => {
         return () => clearInterval(timerInterval);
     }, [paused, gamePaused]);
 
-    const handleAnswer = (selectedOption) => {
+    const handleAnswer = async (selectedOption) => {
         if (selectedOption === currentQuestion.answer) {
             setFeedback('Correct!');
             setFeedbackColor('green');
             const newScore = score + 100;
             setScore(newScore);
     
-            // Check and update the high score if the new score is higher
             if (newScore > highScore) {
-                updateHighScoreForLevel(difficulty, level, score);
-                setHighScore(score);
+                try {
+                    setHighScore(newScore);
+                } catch (error) {
+                    console.error('Failed to update high score:', error);
+                }
             }
         } else {
             setFeedback('Incorrect.');
             setFeedbackColor('red');
-            const newScore = score - 200;
-            setScore(newScore);
-    
-            // Check and update the high score if the new score is higher
-            if (newScore > highScore) {
-                updateHighScoreForLevel(difficulty, level, score);
-                setHighScore(newScore);
-            }
-    
+            setScore(score - 200);
             removeLife();
         }
     
-        setTimeout(() => {
+        setTimeout(async () => {
             const nextIndex = currentQuestionIndex + 1;
             if (nextIndex < questions.length) {
                 setCurrentQuestionIndex(nextIndex);
             } else {
                 // End of level logic
                 setGameOver(true);
-                const finalScore = score + (timer * lives.filter(Boolean).length);
+                const finalScore = score + timer * lives.filter(Boolean).length;
                 setScore(finalScore);
-
+    
                 if (finalScore > highScore) {
-                    updateHighScoreForLevel(difficulty, level, finalScore);
-                    setHighScore(finalScore);
+                    try {
+                        await updateHighScoreForLevel(difficulty, level, finalScore);
+                        setHighScore(finalScore);
+                    } catch (error) {
+                        console.error('Failed to update high score at level end:', error);
+                    }
                 }
-
             }
         }, 1000);
     };
