@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "991032724121",
+    "project_id": "math-game-40b03",
+    "storage_bucket": "math-game-40b03.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:991032724121:android:cf8b63cf91b9cb6d6e0608",
+        "android_client_info": {
+          "package_name": "com.mathgame"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAZIsMzLyvQ9zKCqGlUY2rq_jwn_YzK-Ag"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

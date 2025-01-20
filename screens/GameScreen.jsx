@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { View, Text, StyleSheet, ImageBackground, Image, TouchableOpacity } from 'react-native';
 import * as Animatable from 'react-native-animatable';
+import { getHighScoreForLevel, updateHighScoreForLevel } from '../utils/storage/highScoreUtils';
 
 const GameScreen = ({ route, navigation }) => {
     const { questions, level, difficulty } = route.params; // Get the questions and level from SelectLevel screen
@@ -15,6 +16,9 @@ const GameScreen = ({ route, navigation }) => {
     const [shuffledOptions, setShuffledOptions] = useState([]); // State to store shuffled options
     const [timer, setTimer] = useState(120); // Set initial time to 2 minutes (120 seconds)
     const [paused, setPaused] = useState(false); // Pause timer
+    const [score, setScore] = useState(0);
+    const [currentScore, setCurrentScore] = useState(0);
+    const [highScore, setHighScore] = useState(0);  
 
     const currentQuestion = questions[currentQuestionIndex];
 
@@ -26,6 +30,20 @@ const GameScreen = ({ route, navigation }) => {
         }
         return array;
     }
+
+    useEffect(() => {
+        const loadHighScore = async () => {
+            try {
+                const score = await getHighScoreForLevel(difficulty, level);
+                
+                setHighScore(score || 0); // Default to 0 if no high score exists
+            } catch (error) {
+                console.error('Failed to load high score:', error);
+            }
+        };
+    
+        loadHighScore();
+    }, [difficulty, level]);
 
     // Shuffle the options whenever the current question changes
     useEffect(() => {
@@ -70,23 +88,45 @@ const GameScreen = ({ route, navigation }) => {
         return () => clearInterval(timerInterval);
     }, [paused, gamePaused]);
 
-    const handleAnswer = (selectedOption) => {
+    const handleAnswer = async (selectedOption) => {
         if (selectedOption === currentQuestion.answer) {
             setFeedback('Correct!');
             setFeedbackColor('green');
+            const newScore = score + 100;
+            setScore(newScore);
+    
+            if (newScore > highScore) {
+                try {
+                    setHighScore(newScore);
+                } catch (error) {
+                    console.error('Failed to update high score:', error);
+                }
+            }
         } else {
             setFeedback('Incorrect.');
             setFeedbackColor('red');
+            setScore(score - 200);
             removeLife();
         }
-
-        setTimeout(() => {
+    
+        setTimeout(async () => {
             const nextIndex = currentQuestionIndex + 1;
             if (nextIndex < questions.length) {
                 setCurrentQuestionIndex(nextIndex);
             } else {
-                // If all questions are used, handle end of level
+                // End of level logic
                 setGameOver(true);
+                const finalScore = score + timer * lives.filter(Boolean).length;
+                setScore(finalScore);
+    
+                if (finalScore > highScore) {
+                    try {
+                        await updateHighScoreForLevel(difficulty, level, finalScore);
+                        setHighScore(finalScore);
+                    } catch (error) {
+                        console.error('Failed to update high score at level end:', error);
+                    }
+                }
             }
         }, 1000);
     };
@@ -101,12 +141,21 @@ const GameScreen = ({ route, navigation }) => {
     };
 
     const handleLevelSelection = () => {
+        resetGame();
         navigation.navigate('SelectLevel', { difficulty: difficulty });
     };
 
     const handleBackToHome = () => {
+        resetGame();
         navigation.navigate('Home');
     };
+
+    const resetGame = () => {
+        setGameOver(false);
+            setGameFailed(false);
+            setPaused(false);
+            setLives([true, true, true]);
+    }
 
     const handleNextLevel = () => {
         if (level < 5) {
@@ -120,12 +169,13 @@ const GameScreen = ({ route, navigation }) => {
             setCurrentQuestionIndex(0);
 
             // Reset the game over state for the next level
-            setGameOver(false);
-            setGameFailed(false);
-            setPaused(false);
+            resetGame();
 
             // Reset the timer to 2 minutes for the next level
             setTimer(120);
+
+            // Reset the score to 0 for the next level
+            setScore(0);
 
             // Navigate to the Game screen with the next level and its questions
             navigation.navigate('Game', {
@@ -208,7 +258,7 @@ const GameScreen = ({ route, navigation }) => {
 
             <View style={styles.pauseHeartContainer}>
                 <View style={styles.scoreContainer}>
-                    <Text style={styles.scoreStopwatchText}>Score: 31</Text>
+                    <Text style={styles.scoreStopwatchText}>Score: {score}</Text>
                 </View>
                 <View style={styles.stopwatchContainer}>
                     <Image
@@ -230,7 +280,7 @@ const GameScreen = ({ route, navigation }) => {
                                 { color: lives.every(life => !life) || gameFailed ? 'red' : 'green' }
                             ]}
                         >
-                            {lives.every(life => !life) || gameFailed ? 'Level Failed!' : 'Level Complete!'}
+                            {lives.every(life => !life) || gameFailed ? 'Level Failed!' : `Level Complete! Score: ${score} High Score: ${highScore}`}
                         </Text>
                         <View style={styles.buttonContainer}>
                             <TouchableOpacity
