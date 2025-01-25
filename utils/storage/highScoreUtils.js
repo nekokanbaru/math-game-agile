@@ -1,4 +1,5 @@
 import { storage } from "./storage";
+console.log("Storage object loaded:", storage);
 import { db } from "../../firebase/firebaseInit";
 import { collection, addDoc, getDocs, query, orderBy, limit, collectionGroup } from "firebase/firestore";
 import {
@@ -14,9 +15,9 @@ const CURRENT_USER_KEY = "math_game_current_user";
 // Default high scores structure
 const defaultScores = {
   easy: { 1: 0, 2: 0, 3: 0, 4: 0, 5: 0 },
-      medium: { 1: 0, 2: 0, 3: 0, 4: 0, 5: 0 },
-      hard: { 1: 0, 2: 0, 3: 0, 4: 0, 5: 0 },
-      expert: { 1: 0, 2: 0, 3: 0, 4: 0, 5: 0 }
+  medium: { 1: 0, 2: 0, 3: 0, 4: 0, 5: 0 },
+  hard: { 1: 0, 2: 0, 3: 0, 4: 0, 5: 0 },
+  expert: { 1: 0, 2: 0, 3: 0, 4: 0, 5: 0 }
 };
 
 // Initialize users structure if not already set
@@ -53,7 +54,7 @@ export const getAllUsersWithScores = () => {
   const usersWithScores = Object.entries(users).map(([username, scores]) => {
     const totalScore = Object.values(scores).reduce((total, levels) =>
       total + Object.values(levels).reduce((sum, score) => sum + score, 0)
-    , 0);
+      , 0);
     return { username, score: totalScore };
   });
   return usersWithScores;
@@ -112,7 +113,7 @@ export const getTotalHighScore = () => {
   const scores = getAllHighScores();
   return Object.values(scores).reduce((total, levels) =>
     total + Object.values(levels).reduce((sum, score) => sum + score, 0)
-  , 0);
+    , 0);
 };
 
 // Add a user's score to the global leaderboard
