@@ -14,10 +14,10 @@ const CURRENT_USER_KEY = "math_game_current_user";
 
 // Default high scores structure
 const defaultScores = {
-  easy: { 1: 0, 2: 0, 3: 0, 4: 0, 5: 0 },
-  medium: { 1: 0, 2: 0, 3: 0, 4: 0, 5: 0 },
-  hard: { 1: 0, 2: 0, 3: 0, 4: 0, 5: 0 },
-  expert: { 1: 0, 2: 0, 3: 0, 4: 0, 5: 0 }
+  easy: { 1: { score: 0, completed: false }, 2: { score: 0, completed: false }, 3: { score: 0, completed: false }, 4: { score: 0, completed: false }, 5: { score: 0, completed: false } },
+  medium: { 1: { score: 0, completed: false }, 2: { score: 0, completed: false }, 3: { score: 0, completed: false }, 4: { score: 0, completed: false }, 5: { score: 0, completed: false } },
+  hard: { 1: { score: 0, completed: false }, 2: { score: 0, completed: false }, 3: { score: 0, completed: false }, 4: { score: 0, completed: false }, 5: { score: 0, completed: false } },
+  expert: { 1: { score: 0, completed: false }, 2: { score: 0, completed: false }, 3: { score: 0, completed: false }, 4: { score: 0, completed: false }, 5: { score: 0, completed: false } },
 };
 
 // Initialize users structure if not already set
@@ -26,8 +26,8 @@ const initializeUsers = async () => {
     storage.set(USERS_KEY, JSON.stringify({}));
   }
   if (!storage.getString(CURRENT_USER_KEY)) {
-    storage.set(CURRENT_USER_KEY, "default"); // Set a default user
-    addUser("default"); // Create the default user
+    storage.set(CURRENT_USER_KEY, "guest"); // Set a default user
+    addUser("guest"); // Create the default user
   }
 };
 
@@ -37,7 +37,7 @@ export const addUser = async (username) => {
   if (!users[username]) {
     // Initialize Firebase user data
     await firebaseUpdateHighScoreForLevel(username, "easy", 1, 0); // Initialize Firebase user if not found
-    users[username] = { ...defaultScores }; // Initialize scores locally
+    users[username] = JSON.parse(JSON.stringify(defaultScores)); // Initialize scores locally
     saveUsers(users);
   }
   setCurrentUser(username);
@@ -46,15 +46,16 @@ export const addUser = async (username) => {
 // Get all users
 export const getAllUsers = () => {
   const users = storage.getString(USERS_KEY);
+  console.log(users)
   return users ? JSON.parse(users) : {};
 };
 
 export const getAllUsersWithScores = () => {
-  const users = getAllUsers(); // Retrieve all users
+  const users = getAllUsers();
   const usersWithScores = Object.entries(users).map(([username, scores]) => {
     const totalScore = Object.values(scores).reduce((total, levels) =>
-      total + Object.values(levels).reduce((sum, score) => sum + score, 0)
-      , 0);
+      total + Object.values(levels).reduce((sum, level) => sum + (level.score || 0), 0)
+    , 0);
     return { username, score: totalScore };
   });
   return usersWithScores;
@@ -83,37 +84,60 @@ export const getAllHighScores = () => {
 // Get high score for a specific level and difficulty for the current user
 export const getHighScoreForLevel = (difficulty, level) => {
   const scores = getAllHighScores();
-  return scores[difficulty]?.[level] ?? 0; // Default to 0 if not found
+  return scores[difficulty]?.[level] ?? { score: 0, completed: false };
 };
 
 // Update high score for a specific level and difficulty for the current user
 export const updateHighScoreForLevel = async (difficulty, level, newScore) => {
-  const currentUser = getCurrentUser();
-  const users = getAllUsers();
+  try {
+    const currentUser = getCurrentUser();
+    const users = getAllUsers();
 
-  if (users[currentUser]?.[difficulty]?.[level] !== undefined) {
-    const currentScore = users[currentUser][difficulty][level];
-    if (newScore > currentScore) {
-      // Update local storage
-      users[currentUser][difficulty][level] = newScore;
-      saveUsers(users);
-
-      // Recalculate total score and sync with global leaderboard
-      const totalScore = getTotalHighScore();
-      await firebaseUpdateHighScoreForLevel(currentUser, difficulty, level, newScore);
-      addGlobalScore(currentUser, totalScore);
+    if (!currentUser || !users[currentUser]) {
+      console.error("Invalid current user.");
+      return;
     }
-  } else {
-    console.error(`Invalid difficulty or level: ${difficulty} -> ${level}`);
+
+    // Validate difficulty and level exist for the user
+    const userDifficulty = users[currentUser][difficulty];
+    if (userDifficulty && userDifficulty[level] !== undefined) {
+      const currentLevelData = userDifficulty[level];
+      const currentScore = currentLevelData.score;
+
+      if (newScore > currentScore) {
+        // Update the local storage
+        users[currentUser][difficulty][level].score = newScore;
+        users[currentUser][difficulty][level].completed = true; // Mark as completed
+        saveUsers(users);
+
+        // If the current user is "guest," skip Firebase update
+        if (currentUser === "guest") {
+          console.log("Skipping Firebase update for guest user.");
+          return;
+        }
+
+        // Recalculate total score
+        const totalScore = getTotalHighScore();
+
+        // Sync the new high score with Firebase
+        await firebaseUpdateHighScoreForLevel(currentUser, difficulty, level, newScore);
+
+        // Update the global leaderboard with the total score
+        addGlobalScore(currentUser, totalScore);
+      }
+    } else {
+      console.error(`Invalid difficulty or level: ${difficulty} -> ${level}`);
+    }
+  } catch (error) {
+    console.error("Error updating high score:", error);
   }
 };
 
-// Get total high score for the current user
 export const getTotalHighScore = () => {
   const scores = getAllHighScores();
   return Object.values(scores).reduce((total, levels) =>
-    total + Object.values(levels).reduce((sum, score) => sum + score, 0)
-    , 0);
+    total + Object.values(levels).reduce((sum, level) => sum + (level.score || 0), 0)
+  , 0);
 };
 
 // Add a user's score to the global leaderboard

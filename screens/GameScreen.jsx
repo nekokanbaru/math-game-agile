@@ -34,9 +34,10 @@ const GameScreen = ({ route, navigation }) => {
     useEffect(() => {
         const loadHighScore = async () => {
             try {
-                const score = await getHighScoreForLevel(difficulty, level);
-
-                setHighScore(score || 0); // Default to 0 if no high score exists
+                const data = await getHighScoreForLevel(difficulty, level);
+                const score = data?.score ?? 0; // Default to 0 if no high score exists
+                
+                setHighScore(score);
             } catch (error) {
                 console.error('Failed to load high score:', error);
             }
