@@ -18,7 +18,7 @@ const GameScreen = ({ route, navigation }) => {
     const [paused, setPaused] = useState(false); // Pause timer
     const [score, setScore] = useState(0);
     const [currentScore, setCurrentScore] = useState(0);
-    const [highScore, setHighScore] = useState(0);  
+    const [highScore, setHighScore] = useState(0);
 
     const currentQuestion = questions[currentQuestionIndex];
 
@@ -35,13 +35,13 @@ const GameScreen = ({ route, navigation }) => {
         const loadHighScore = async () => {
             try {
                 const score = await getHighScoreForLevel(difficulty, level);
-                
+
                 setHighScore(score || 0); // Default to 0 if no high score exists
             } catch (error) {
                 console.error('Failed to load high score:', error);
             }
         };
-    
+
         loadHighScore();
     }, [difficulty, level]);
 
@@ -56,21 +56,21 @@ const GameScreen = ({ route, navigation }) => {
 
     //If the hearts run out pause the timer and end the level
     useEffect(() => {
-        if(lives.every(life => !life)){
+        if (lives.every(life => !life)) {
             setPaused(true);
             setGameFailed(true);
         }
     }, [lives])
 
     useEffect(() => {
-        if(gameOver || gameFailed)
+        if (gameOver || gameFailed)
             setPaused(true);
     }, [gameOver, gameFailed])
 
     // Start and manage the timer
     useEffect(() => {
         const timerInterval = setInterval(() => {
-            if(!paused && !gamePaused){
+            if (!paused && !gamePaused) {
                 setTimer(prevTime => {
                     if (prevTime <= 1) {
                         clearInterval(timerInterval);
@@ -94,7 +94,7 @@ const GameScreen = ({ route, navigation }) => {
             setFeedbackColor('green');
             const newScore = score + 100;
             setScore(newScore);
-    
+
             if (newScore > highScore) {
                 try {
                     setHighScore(newScore);
@@ -108,7 +108,7 @@ const GameScreen = ({ route, navigation }) => {
             setScore(score - 200);
             removeLife();
         }
-    
+
         setTimeout(async () => {
             const nextIndex = currentQuestionIndex + 1;
             if (nextIndex < questions.length) {
@@ -118,7 +118,7 @@ const GameScreen = ({ route, navigation }) => {
                 setGameOver(true);
                 const finalScore = score + timer * lives.filter(Boolean).length;
                 setScore(finalScore);
-    
+
                 if (finalScore > highScore) {
                     try {
                         await updateHighScoreForLevel(difficulty, level, finalScore);
@@ -152,9 +152,9 @@ const GameScreen = ({ route, navigation }) => {
 
     const resetGame = () => {
         setGameOver(false);
-            setGameFailed(false);
-            setPaused(false);
-            setLives([true, true, true]);
+        setGameFailed(false);
+        setPaused(false);
+        setLives([true, true, true]);
     }
 
     const handleNextLevel = () => {
@@ -249,7 +249,7 @@ const GameScreen = ({ route, navigation }) => {
                             animation={life ? undefined : 'zoomOut'}
                             duration={500}
                             style={styles.heartImage}
-                            source={require('../assets/images/heart.png')}
+                            source={require('../assets/images/favorite.png')}
                             resizeMode="cover"
                         />
                     ))}
@@ -354,14 +354,14 @@ const styles = StyleSheet.create({
         left: '10%',
         width: '80%',
         height: '50%',
-        zIndex:2,
+        zIndex: 2,
         gap: 30,
         borderRadius: 20
     },
     pausedText: {
         textAlign: 'center',
         fontSize: 44,
-        color:'#18244a',
+        color: '#18244a',
         fontWeight: 'bold',
         letterSpacing: 2
     },
@@ -412,9 +412,9 @@ const styles = StyleSheet.create({
         padding: 20,
     },
     heartImage: {
-        width: 60,
-        height: 60,
-        marginEnd: 10,
+        width: 85,
+        height: 85,
+        marginEnd: -15,
     },
     pauseImage: {
         width: 60,
