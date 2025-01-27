@@ -46,7 +46,6 @@ export const addUser = async (username) => {
 // Get all users
 export const getAllUsers = () => {
   const users = storage.getString(USERS_KEY);
-  console.log(users)
   return users ? JSON.parse(users) : {};
 };
 
