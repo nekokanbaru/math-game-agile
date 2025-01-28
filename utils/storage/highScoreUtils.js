@@ -154,7 +154,7 @@ export const addGlobalScore = async (username, score) => {
 
 // Fetch top N scores from the global leaderboard
 
-export const getGlobalLeaderboard = async (limitCount = 10) => {
+export const getGlobalLeaderboard = async (limitCount = 50) => {
   try {
     const leaderboard = [];
 

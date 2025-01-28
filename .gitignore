@@ -37,6 +37,11 @@ local.properties
 # node.js
 #
 node_modules/
+node_modules_*
+assets_images_*
+app-release*
+output-metadata.json
+index.android.bundle
 npm-debug.log
 yarn-error.log
 
