@@ -32,16 +32,36 @@ const initializeUsers = async () => {
 };
 
 // Add a new user
+// Add a new user with additional checks
 export const addUser = async (username) => {
-  const users = getAllUsers();
-  if (!users[username]) {
-    // Initialize Firebase user data
-    await firebaseUpdateHighScoreForLevel(username, "easy", 1, 0); // Initialize Firebase user if not found
+  const users = getAllUsers(); // Local users from storage
+  const globalUsers = await getGlobalLeaderboard(); // Fetch global leaderboard
+
+  const globalUsernames = globalUsers.map((user) => user.username); // Extract global usernames
+  const isInGlobal = globalUsernames.includes(username); // Check if username exists in global users
+  const isInLocal = !!users[username]; // Check if username exists in local storage
+
+  if (isInGlobal && !isInLocal) {
+    // User exists in global but not in local, return false
+    return false;
+  }
+
+  if (isInGlobal && isInLocal) {
+    // User exists in both global and local, set the user
+    setCurrentUser(username);
+    return true;
+  }
+
+  if (!isInGlobal) {
+    // User doesn't exist in global, add them locally and globally
+    await firebaseUpdateHighScoreForLevel(username, "easy", 1, 0); // Initialize Firebase user
     users[username] = JSON.parse(JSON.stringify(defaultScores)); // Initialize scores locally
     saveUsers(users);
+    setCurrentUser(username);
+    return true;
   }
-  setCurrentUser(username);
 };
+
 
 // Get all users
 export const getAllUsers = () => {
