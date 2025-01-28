@@ -1,8 +1,20 @@
-import React, { useState, useEffect } from 'react';
-import { View, Text, TouchableOpacity, StyleSheet, ScrollView, ImageBackground } from 'react-native';
-import { getAllUsersWithScores, getCurrentUser, getTotalHighScore, getGlobalLeaderboard } from '../utils/storage/highScoreUtils'; // Import functions
+import React, {useState, useEffect} from 'react';
+import {
+  View,
+  Text,
+  TouchableOpacity,
+  StyleSheet,
+  ScrollView,
+  ImageBackground,
+  Image,
+} from 'react-native';
+import {
+  getAllUsersWithScores,
+  getCurrentUser,
+  getGlobalLeaderboard,
+} from '../utils/storage/highScoreUtils'; // Import functions
 
-const LeaderboardScreen = ({ navigation }) => {
+const LeaderboardScreen = ({navigation}) => {
   const [leaderboardData, setLeaderboardData] = useState([]);
   const [viewMode, setViewMode] = useState('local'); // local or global
 
@@ -44,22 +56,47 @@ const LeaderboardScreen = ({ navigation }) => {
         </TouchableOpacity>
 
         {/* Leaderboard View Mode Toggle Button */}
-        <TouchableOpacity style={styles.headerButton} onPress={toggleLeaderboardView}>
+        <TouchableOpacity
+          style={styles.headerButton}
+          onPress={toggleLeaderboardView}>
           <Text style={styles.headerButtonText}>
             {viewMode === 'local' ? 'Global' : 'Local'}
           </Text>
         </TouchableOpacity>
       </View>
 
-      <Text style={styles.headerText}>{viewMode != 'local' ? 'GLOBAL LEADERBOARD' : 'LOCAL LEADERBOARD'}</Text>
+      <Text style={styles.headerText}>
+        {viewMode !== 'local' ? 'GLOBAL LEADERBOARD' : 'LOCAL LEADERBOARD'}
+      </Text>
 
       {/* Leaderboard */}
       <ScrollView style={styles.leaderboardContainer}>
         {leaderboardData.slice(0, 10).map((item, index) => (
           <View key={index} style={styles.leaderboardRow}>
-            <Text style={styles.leaderboardText}>
-              {index + 1}. {item.username}
-            </Text>
+            <View style={styles.trophyContainer}>
+              <Text style={styles.leaderboardText}>
+                {index + 1}. {item.username}
+              </Text>
+              {/* Trophy for Top 3 */}
+              {index === 0 && (
+                <Image
+                  source={require('../assets/images/golden_trophy.png')}
+                  style={styles.trophy}
+                />
+              )}
+              {index === 1 && (
+                <Image
+                  source={require('../assets/images/silver_trophy.png')}
+                  style={styles.trophy}
+                />
+              )}
+              {index === 2 && (
+                <Image
+                  source={require('../assets/images/bronze_trophy.png')}
+                  style={styles.trophy}
+                />
+              )}
+            </View>
             <Text style={styles.leaderboardText}>{item.score}</Text>
           </View>
         ))}
@@ -68,10 +105,17 @@ const LeaderboardScreen = ({ navigation }) => {
       {/* Footer */}
       <View style={styles.footer}>
         <Text style={styles.footerText}>
-          Your Best Score: {leaderboardData.find(user => user.username === getCurrentUser())?.score || 'N/A'}
+          Your Best Score:{' '}
+          {leaderboardData.find(user => user.username === getCurrentUser())
+            ?.score || 'N/A'}
         </Text>
         <Text style={styles.footerText}>
-          Your Place: {leaderboardData.findIndex(user => user.username === getCurrentUser()) + 1 + '.' || 'N/A'}
+          Your Place:{' '}
+          {leaderboardData.findIndex(
+            user => user.username === getCurrentUser(),
+          ) +
+            1 +
+            '.' || 'N/A'}
         </Text>
       </View>
     </ImageBackground>
@@ -85,19 +129,14 @@ const styles = StyleSheet.create({
   },
   header: {
     paddingVertical: 16,
-    display: 'flex',
     flexDirection: 'row',
-    justifyContent: 'space-around'
+    justifyContent: 'space-around',
   },
   headerText: {
     fontSize: 60,
     color: '#cfd4dd',
     fontFamily: 'BebasNeue-Regular',
     textAlign: 'center',
-  },
-  toggleContainer: {
-    alignItems: 'center',
-    marginBottom: 10,
   },
   leaderboardContainer: {
     flex: 1,
@@ -111,6 +150,7 @@ const styles = StyleSheet.create({
   leaderboardRow: {
     flexDirection: 'row',
     justifyContent: 'space-between',
+    alignItems: 'center',
     paddingHorizontal: 16,
     paddingVertical: 11.5,
     borderBottomWidth: 1,
@@ -145,6 +185,15 @@ const styles = StyleSheet.create({
     color: '#cfd4dd',
     fontSize: 30,
     fontFamily: 'BebasNeue-Regular',
+  },
+  trophy: {
+    width: 30,
+    height: 30,
+    marginLeft: 8,
+  },
+  trophyContainer: {
+    display: 'flex',
+    flexDirection: 'row',
   },
 });
 
