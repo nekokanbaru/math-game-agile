@@ -55,7 +55,7 @@ const LeaderboardScreen = ({ navigation }) => {
 
       {/* Leaderboard */}
       <ScrollView style={styles.leaderboardContainer}>
-        {leaderboardData.map((item, index) => (
+        {leaderboardData.slice(0, 10).map((item, index) => (
           <View key={index} style={styles.leaderboardRow}>
             <Text style={styles.leaderboardText}>
               {index + 1}. {item.username}
@@ -68,7 +68,7 @@ const LeaderboardScreen = ({ navigation }) => {
       {/* Footer */}
       <View style={styles.footer}>
         <Text style={styles.footerText}>
-          Your Best Score: {getTotalHighScore()}
+          Your Best Score: {leaderboardData.find(user => user.username === getCurrentUser())?.score || 'N/A'}
         </Text>
         <Text style={styles.footerText}>
           Your Place: {leaderboardData.findIndex(user => user.username === getCurrentUser()) + 1 + '.' || 'N/A'}
