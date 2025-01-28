@@ -1,6 +1,15 @@
 import React, { useState, useEffect } from "react";
-import { StyleSheet, Text, View, ImageBackground, TextInput, TouchableOpacity, Image } from "react-native";
+import { StyleSheet, Text, View, ImageBackground, TextInput, TouchableOpacity } from "react-native";
+import Sound from 'react-native-sound';
 import { getCurrentUser, addUser, setCurrentUser } from "../utils/storage/highScoreUtils";
+
+// Inicijalizujte zvuk
+Sound.setCategory('Playback');
+const clickSound = new Sound(require('../assets/sounds/click.wav'), error => {
+  if (error) {
+    console.log('Error loading sound:', error);
+  }
+});
 
 const HomeScreen = ({ navigation }) => {
   const [username, setUsername] = useState("");
@@ -18,6 +27,11 @@ const HomeScreen = ({ navigation }) => {
       addUser(username); // Add or switch to the new user
       setLocalCurrentUser(username); // Update locally
     }
+    clickSound.play(); // Play the click sound when the username is confirmed
+  };
+
+  const handleButtonPress = () => {
+    clickSound.play(); // Play the click sound when any button is pressed
   };
 
   return (
@@ -33,7 +47,7 @@ const HomeScreen = ({ navigation }) => {
         {currentUser ? (
           <>
             <Text style={styles.greeting}>Hi, {currentUser}!</Text>
-            <TouchableOpacity onPress={() => setLocalCurrentUser("")} style={styles.button}>
+            <TouchableOpacity onPress={() => { setLocalCurrentUser(""); handleButtonPress(); }} style={styles.button}>
               <Text style={styles.userButtonText}>CHANGE USERNAME</Text>
             </TouchableOpacity>
           </>
@@ -46,16 +60,15 @@ const HomeScreen = ({ navigation }) => {
               value={username}
               onChangeText={setUsername}
             />
-            <TouchableOpacity onPress={handleUsernameChange} style={styles.button}>
+            <TouchableOpacity onPress={() => { handleUsernameChange(); handleButtonPress(); }} style={styles.button}>
               <Text style={styles.userButtonText}>CONFIRM USERNAME</Text>
             </TouchableOpacity>
           </>
         )}
-        <TouchableOpacity title="Play"
-          onPress={() => navigation.navigate('Difficulty')} style={styles.button}>
+        <TouchableOpacity onPress={() => { handleButtonPress(); navigation.navigate('Difficulty'); }} style={styles.button}>
           <Text style={styles.buttonText}>START</Text>
         </TouchableOpacity>
-        <TouchableOpacity onPress={() => navigation.navigate('Leaderboard')} style={styles.button}>
+        <TouchableOpacity onPress={() => { handleButtonPress(); navigation.navigate('Leaderboard'); }} style={styles.button}>
           <Text style={styles.buttonText}>SCOREBOARD</Text>
         </TouchableOpacity>
       </View>
@@ -77,17 +90,6 @@ const styles = StyleSheet.create({
     color: "#cfd4dd",
     marginBottom: 10,
     fontFamily: 'BebasNeue-Regular',
-  },
-
-  profileImage: {
-    resizeMode: 'cover',
-    height: 200,
-    width: 200,
-  },
-  profileImageContainer: {
-    translateY: -43,
-    alignSelf: 'center',
-    marginBottom: '30',
   },
   button: {
     width: 300,
