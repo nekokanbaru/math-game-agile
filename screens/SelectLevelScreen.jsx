@@ -1,5 +1,9 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import { View, StyleSheet, ImageBackground, TouchableOpacity, Text } from 'react-native';
+import Sound from 'react-native-sound';
+
+// Enable playback of sound immediately
+Sound.setCategory('Playback');
 import { getCurrentUser, getAllUsers } from '../utils/storage/highScoreUtils';
 
 const SelectLevelScreen = ({ route, navigation }) => {
@@ -8,9 +12,31 @@ const SelectLevelScreen = ({ route, navigation }) => {
     const users = getAllUsers();
     const userProgress = users[getCurrentUser()][difficulty];
 
-    const handleBackToDifficulty = () => {
-        navigation.navigate('Difficulty');
+    // Load the sound
+    const clickSound = new Sound(require('../assets/sounds/click.wav'), error => {
+        if (error) {
+            console.log('Failed to load the sound', error);
+        }
+    });
+
+    // Handle button press with sound
+    const handleButtonPress = (level) => {
+        clickSound.play(() => {
+            navigation.navigate('Game', { questions: level.questions, difficulty: difficulty, level: level.level });
+        });
     };
+
+    // Handle back navigation with sound
+    const handleBackToDifficulty = () => {
+        clickSound.play(() => {
+            navigation.navigate('Difficulty');
+        });
+    };
+
+    useEffect(() => {
+        // Cleanup the sound on unmount
+        return () => clickSound.release();
+    }, []);
 
     return (
         <ImageBackground
@@ -46,8 +72,8 @@ const SelectLevelScreen = ({ route, navigation }) => {
                         </TouchableOpacity>
                     );
                 })}
-            </View>
-        </ImageBackground>
+            </View >
+        </ImageBackground >
     );
 };
 

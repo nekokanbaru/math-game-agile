@@ -1,34 +1,51 @@
 import React, { useState, useEffect } from 'react';
 import { View, Text, TouchableOpacity, StyleSheet, ScrollView, ImageBackground } from 'react-native';
-import { getAllUsersWithScores, getCurrentUser, getTotalHighScore, getGlobalLeaderboard } from '../utils/storage/highScoreUtils'; // Import functions
+import Sound from 'react-native-sound'; // Uvoz zvučnog paketa
+import { getAllUsersWithScores, getCurrentUser, getTotalHighScore, getGlobalLeaderboard } from '../utils/storage/highScoreUtils'; // Import funkcija
+
+// Omogućava momentalnu reprodukciju zvuka
+Sound.setCategory('Playback');
 
 const LeaderboardScreen = ({ navigation }) => {
   const [leaderboardData, setLeaderboardData] = useState([]);
-  const [viewMode, setViewMode] = useState('local'); // local or global
+  const [viewMode, setViewMode] = useState('local'); // local ili global
 
-  // Fetch leaderboard data based on the viewMode
+  // Zvučni efekat za klik
+  const clickSound = new Sound(require('../assets/sounds/click.wav'), error => {
+    if (error) {
+      console.log('Neuspešno učitavanje zvuka', error);
+    }
+  });
+
+  // Učitavanje podataka o leaderboard-u u zavisnosti od viewMode
   useEffect(() => {
     const fetchLeaderboardData = async () => {
       if (viewMode === 'local') {
         const usersWithScores = getAllUsersWithScores();
-        const sortedUsers = usersWithScores.sort((a, b) => b.score - a.score); // Sort by highest score
+        const sortedUsers = usersWithScores.sort((a, b) => b.score - a.score); // Sortiranje po najvećem rezultatu
         setLeaderboardData(sortedUsers);
       } else if (viewMode === 'global') {
-        const globalData = await getGlobalLeaderboard(); // Fetch global leaderboard data from Firebase
+        const globalData = await getGlobalLeaderboard(); // Učitavanje globalnog leaderboard-a sa Firebase
         const sortedGlobalUsers = globalData.sort((a, b) => b.score - a.score);
         setLeaderboardData(sortedGlobalUsers);
       }
     };
 
     fetchLeaderboardData();
-  }, [viewMode]); // Run when viewMode changes
+  }, [viewMode]); // Pokreće se kada se promeni viewMode
 
+  // Funkcija za navigaciju nazad na Home
   const handleBackToHome = () => {
-    navigation.navigate('Home');
+    clickSound.play(() => {
+      navigation.navigate('Home');
+    });
   };
 
+  // Funkcija za prebacivanje između lokalnog i globalnog leaderboard-a
   const toggleLeaderboardView = () => {
-    setViewMode(prevMode => (prevMode === 'local' ? 'global' : 'local')); // Toggle between local and global
+    clickSound.play(() => {
+      setViewMode(prevMode => (prevMode === 'local' ? 'global' : 'local')); // Prebacivanje između prikaza
+    });
   };
 
   return (
@@ -43,7 +60,7 @@ const LeaderboardScreen = ({ navigation }) => {
           <Text style={styles.headerButtonText}>Back</Text>
         </TouchableOpacity>
 
-        {/* Leaderboard View Mode Toggle Button */}
+        {/* Toggle dugme za prikaz leaderboard-a */}
         <TouchableOpacity style={styles.headerButton} onPress={toggleLeaderboardView}>
           <Text style={styles.headerButtonText}>
             {viewMode === 'local' ? 'Global' : 'Local'}
@@ -51,7 +68,7 @@ const LeaderboardScreen = ({ navigation }) => {
         </TouchableOpacity>
       </View>
 
-      <Text style={styles.headerText}>{viewMode != 'local' ? 'GLOBAL LEADERBOARD' : 'LOCAL LEADERBOARD'}</Text>
+      <Text style={styles.headerText}>{viewMode !== 'local' ? 'GLOBAL LEADERBOARD' : 'LOCAL LEADERBOARD'}</Text>
 
       {/* Leaderboard */}
       <ScrollView style={styles.leaderboardContainer}>
@@ -71,7 +88,7 @@ const LeaderboardScreen = ({ navigation }) => {
           Your Best Score: {leaderboardData.find(user => user.username === getCurrentUser())?.score || 'N/A'}
         </Text>
         <Text style={styles.footerText}>
-          Your Place: {leaderboardData.findIndex(user => user.username === getCurrentUser()) + 1 + '.' || 'N/A'}
+          Your Place: {leaderboardData.findIndex(user => user.username === getCurrentUser()) + 1 || 'N/A'}
         </Text>
       </View>
     </ImageBackground>
@@ -94,10 +111,6 @@ const styles = StyleSheet.create({
     color: '#cfd4dd',
     fontFamily: 'BebasNeue-Regular',
     textAlign: 'center',
-  },
-  toggleContainer: {
-    alignItems: 'center',
-    marginBottom: 10,
   },
   leaderboardContainer: {
     flex: 1,

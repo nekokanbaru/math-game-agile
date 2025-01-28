@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import Sound from 'react-native-sound';
 import { View, Text, StyleSheet, ImageBackground, Image, TouchableOpacity } from 'react-native';
 import * as Animatable from 'react-native-animatable';
 import { getHighScoreForLevel, updateHighScoreForLevel } from '../utils/storage/highScoreUtils';
@@ -21,6 +22,16 @@ const GameScreen = ({ route, navigation }) => {
     const [highScore, setHighScore] = useState(0);
 
     const currentQuestion = questions[currentQuestionIndex];
+
+    const clickSound = new Sound(require('../assets/sounds/click.wav'), (error) => {
+        if (error) {
+            console.log('Failed to load sound', error);
+        }
+    });
+
+    const playClickSound = () => {
+        clickSound.play();
+    }
 
     // Shuffle function to randomize the order of the options
     function shuffleArray(array) {
@@ -90,6 +101,7 @@ const GameScreen = ({ route, navigation }) => {
     }, [paused, gamePaused]);
 
     const handleAnswer = async (selectedOption) => {
+        playClickSound();
         if (selectedOption === currentQuestion.answer) {
             setFeedback('Correct!');
             setFeedbackColor('green');
@@ -142,16 +154,19 @@ const GameScreen = ({ route, navigation }) => {
     };
 
     const handleLevelSelection = () => {
+        playClickSound();
         resetGame();
         navigation.navigate('SelectLevel', { difficulty: difficulty });
     };
 
     const handleBackToHome = () => {
+        playClickSound();
         resetGame();
         navigation.navigate('Home');
     };
 
     const resetGame = () => {
+        playClickSound();
         setGameOver(false);
         setGameFailed(false);
         setPaused(false);
@@ -211,31 +226,45 @@ const GameScreen = ({ route, navigation }) => {
             style={styles.background}
         >
             {/* Pause screen */}
+            {/* Pause screen */}
             {gamePaused && <View style={styles.pauseScreen}>
                 <Text style={styles.pausedText}>PAUSED</Text>
                 <TouchableOpacity
                     style={styles.pausedButton}
-                    onPress={() => setGamePaused(false)}
+                    onPress={() => {
+                        playClickSound();  // Play click sound
+                        setGamePaused(false);  // Resume the game
+                    }}
                 >
                     <Text style={styles.buttonText}>Resume</Text>
                 </TouchableOpacity>
                 <TouchableOpacity
                     style={styles.pausedButton}
-                    onPress={() => handleLevelSelection()}
+                    onPress={() => {
+                        playClickSound();  // Play click sound
+                        handleLevelSelection();  // Go to level selection
+                    }}
                 >
                     <Text style={styles.buttonText}>Level selection</Text>
                 </TouchableOpacity>
                 <TouchableOpacity
                     style={styles.pausedButton}
-                    onPress={() => handleBackToHome()}
+                    onPress={() => {
+                        playClickSound();  // Play click sound
+                        handleBackToHome();  // Go back to home
+                    }}
                 >
                     <Text style={styles.buttonText}>Back to home</Text>
                 </TouchableOpacity>
             </View>}
+
             {/* Top Section: Hearts, Pause Icon, Score, Timer */}
             <View style={styles.pauseHeartContainer}>
                 <View>
-                    <TouchableOpacity onPress={() => setGamePaused(true)}>
+                    <TouchableOpacity onPress={() => {
+                        playClickSound();  // Play click sound when the pause button is pressed
+                        setGamePaused(true);  // Pause the game
+                    }}>
                         <Image
                             style={styles.pauseImage}
                             source={require('../assets/images/pause.png')}
@@ -256,6 +285,7 @@ const GameScreen = ({ route, navigation }) => {
                     ))}
                 </View>
             </View>
+
 
             <View style={styles.pauseHeartContainer}>
                 <View style={styles.scoreContainer}>
