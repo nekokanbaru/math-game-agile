@@ -5,6 +5,7 @@ import { getCurrentUser, addUser, setCurrentUser } from "../utils/storage/highSc
 const HomeScreen = ({ navigation }) => {
   const [username, setUsername] = useState("");
   const [currentUser, setLocalCurrentUser] = useState("");
+  const [usernameError, setUsernameError] = useState(false);
 
   // Initialize with the current user
   useEffect(() => {
@@ -13,10 +14,15 @@ const HomeScreen = ({ navigation }) => {
     setUsername(user); // Pre-fill with the current username
   }, []);
 
-  const handleUsernameChange = () => {
+  const handleUsernameChange = async () => {
     if (username.trim() !== "") {
-      addUser(username); // Add or switch to the new user
-      setLocalCurrentUser(username); // Update locally
+      const result = await addUser(username); // Wait for the result of addUser
+      if (result) {
+        setLocalCurrentUser(username); // Update locally
+        setUsernameError(false); // Clear any previous error
+      } else {
+        setUsernameError(true); // Show error if adding user failed
+      }
     }
   };
 
@@ -46,6 +52,7 @@ const HomeScreen = ({ navigation }) => {
               value={username}
               onChangeText={setUsername}
             />
+            {usernameError && <Text style={styles.userButtonText}>USERNAME ALREADY EXISTS!</Text>}
             <TouchableOpacity onPress={handleUsernameChange} style={styles.button}>
               <Text style={styles.userButtonText}>CONFIRM USERNAME</Text>
             </TouchableOpacity>
